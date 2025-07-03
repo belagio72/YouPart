@@ -1,0 +1,21 @@
+[
+  {
+    "email": "test@example.com",
+    "password": "$2b$10$HUrJJcgyhACIYUUhgpDYg.i6wikj.0BYS.HJwjmRJEzIkkFQKHUai"
+  },
+  {
+    "email": "demo@site.com",
+    "password": "$2b$10$pGnSrlIclUTe3Yq0mBHhFexrwgZx3wV9ePZ2DkOpTldL876bSmyLy"
+  },
+  {
+    "email": "belagio72@gmail.com",
+    "password": "$2b$10$jSWEdsDlH5MQ2V3GpEJBxOYEsv7iSHcIC1mSEJER9k2friheeC5ze"
+  },
+  {
+    "email": "tchintchev@gmail.com",
+    "password": "$2b$12$Yy.Wmtz.P57bXXetatGq5eDbm6.GzEQ0Vk9T1nAn.FuVKHjfsGk3.",
+    "name": "Vrinda Misir",
+    "phone": "4068319331",
+    "address": "78 Aprilov blvd"
+  }
+]

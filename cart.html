@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Количка | YouPart</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Sansation&display=swap" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Десктоп хедър -->
+  <header id="desktop-header">
+    <div class="header-container">
+      <div class="logo-container">
+        <img src="youpart logo.png" alt="Лого" />
+        <div class="logo-text">
+          <h1><span class="red-word">Авточасти</span> втора употреба<br>от Европа и Северна Америка</h1>
+        </div>
+      </div>
+      <div class="header-right">
+        
+        <div id="cart-container" class="cart-container">
+          <a href="cart.html" class="cart-link">
+            <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+              <path d="M160 400a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm256 0a48 48 0 1 0 48 48 48 48 0 0 0-48-48zM165.1 288h230.7a48 48 0 0 0 45.3-30.5l65.9-165.2A16 16 0 0 0 493.3 80H128l-12.4-37.1A16 16 0 0 0 100.3 32H16A16 16 0 0 0 0 48v16a16 16 0 0 0 16 16h66.7l94 281.1A80 80 0 0 0 256 416h144a16 16 0 0 0 0-32H256a48 48 0 0 1-45.3-30.5l-8.6-21.5z"/>
+            </svg>
+            <span id="cart-count" class="cart-count">0</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <div id="mobile-header">
+  <div class="mobile-header-top">
+  <span><span style="color:#F72616;">Части</span> втора употреба от Европа и САЩ</span>
+</div>
+
+  <div class="mobile-header-bottom">
+    <img src="youpart logo.png" alt="Лого">
+    <div class="mobile-header-right">
+      <a href="cart.html" class="cart-icon-mobile">
+        <svg style="width:26px;height:26px;fill:black;" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <path d="M160 400a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm256 0a48 48 0 1 0 48 48 48 48 0 0 0-48-48zM165.1 288h230.7a48 48 0 0 0 45.3-30.5l65.9-165.2A16 16 0 0 0 493.3 80H128l-12.4-37.1A16 16 0 0 0 100.3 32H16A16 16 0 0 0 0 48v16a16 16 0 0 0 16 16h66.7l94 281.1A80 80 0 0 0 256 416h144a16 16 0 0 0 0-32H256a48 48 0 0 1-45.3-30.5l-8.6-21.5z"/>
+        </svg>
+        <span id="cart-count-mobile">0</span>
+      </a>
+      
+    </div>
+  </div>
+</div>
+<div class="custom-buttons">
+  <button class="info-btn" onclick="window.location.href='index.html'">Начало</button>
+  <button class="info-btn" onclick="location.href='index.html#how-it-works'">Как работи?</button>
+  <button class="info-btn" onclick="location.href='index.html#delivery-returns'">Доставка и връщане</button>
+</div>
+
+
+  <main class="cart-container">
+    <h1 class="cart-title">Количка</h1>
+    <p id="welcomeUser"></p>
+    
+    <div id="cart" class="cart-items">
+      <!-- Продуктите ще се зареждат тук -->
+    </div>
+
+    <div class="cart-summary">
+      <div class="cart-summary-row">
+        <span>Продукти:</span>
+        <span id="productTotal">0.00 лв.</span>
+      </div>
+      <div class="cart-summary-row">
+        <span>Допълнителна сума:</span>
+        <span id="extraTotal">0.00 лв.</span>
+      </div>
+      <div class="cart-summary-row">
+        <span>Общо (EUR):</span>
+        <span id="finalTotalEUR">0.00 €</span>
+      </div>
+      <div class="cart-summary-row cart-summary-total">
+        <span>Общо (BGN):</span>
+        <span id="finalTotal">0.00 лв.</span>
+      </div>
+    </div>
+
+<div class="cart-bottom-bar">
+  <div class="order-row">
+    <button id="orderBtn" class="btn btn-primary" onclick="showCheckout()" disabled>Поръчай</button>
+
+    <input type="checkbox" id="termsCheckbox" />
+    <label for="termsCheckbox" class="terms-label">
+      Запознат съм и съм съгласен с<br>
+      <a href="index.html#delivery-returns">условията на доставка и връщане</a>
+    </label>
+  </div>
+
+  <div class="extra-charge-section">
+    <button class="btn btn-secondary" onclick="toggleExtraCharge()">➕ Добави сума</button>
+    <div id="extraChargeInputs" class="extra-charge-inputs">
+      <label>Допълнителна сума:</label>
+      <div class="extra-input-group">
+        <input type="number" id="extraBGN" placeholder="лв." min="0">
+        <span>,</span>
+        <input type="number" id="extraSt" placeholder="ст." min="0" max="99">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    <div id="checkoutSection" class="checkout-section">
+      <h2>Данни за доставка</h2>
+      <form class="checkout-form">
+        <div class="form-group">
+          <label for="name">Име и фамилия</label>
+          <input type="text" id="name" placeholder="Име и фамилия" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Имейл адрес</label>
+          <input type="email" id="email" placeholder="Имейл адрес" autocomplete="off" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Телефонен номер</label>
+          <input type="tel" id="phone" placeholder="Телефонен номер" required>
+        </div>
+        <div class="form-group">
+          <label for="address">Адрес</label>
+          <input type="text" id="address" placeholder="град, п.к., улица, №, допълнително" required>
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" id="createAccount"> Създай акаунт</label>
+          <input type="password" id="password1" placeholder="Парола" style="display: none;">
+          <input type="password" id="password2" placeholder="Потвърди паролата" style="display: none;">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="submitOrder()">Изпрати поръчка</button>
+      </form>
+      
+      <button id="payBtn" class="btn btn-primary" onclick="startCheckout()" style="display: none; margin-top: 20px;">Плати</button>
+    </div>
+  </main>
+
+  <script>
+    let cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+
+    function updateCartCount() {
+      const count = cartItems.length;
+      document.getElementById('cart-count').textContent = count;
+      document.getElementById('cart-count-mobile').textContent = count;
+      localStorage.setItem('cartItemCount', count);
+    }
+
+    function removeItem(index) {
+      cartItems.splice(index, 1);
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+      renderCart();
+      updateCartCount();
+    }
+
+    function renderCart() {
+      const cartDiv = document.getElementById('cart');
+      cartDiv.innerHTML = '';
+
+      updateCartCount();
+
+      if (cartItems.length === 0) {
+        cartDiv.innerHTML = '<div class="cart-empty"><p>Количката е празна.</p></div>';
+        return;
+      }
+
+      cartItems.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <img src="${item.image}" alt="${item.title}">
+          <!-- Промяна в cart.html -->
+<div class="cart-item-details">
+  <h3 class="cart-item-title">${item.title}</h3>
+  <p class="cart-item-price">${item.priceBGN} лв. <span class="price-secondary">(${item.priceEUR} €)</span></p>
+  
+  <div class="cart-item-actions">
+    <button class="btn btn-secondary" onclick="removeItem(${index})">🗑 Премахни</button>
+  </div>
+</div>
+        `;
+        cartDiv.appendChild(div);
+      });
+
+      // Възстановяване на запазени данни при зареждане
+      const savedEmail = localStorage.getItem('customerEmail');
+      if (savedEmail) {
+        document.getElementById('email').value = savedEmail;
+      }
+
+      // Запазване на имейла при промяна
+      document.getElementById('email').addEventListener('change', (e) => {
+        localStorage.setItem('customerEmail', e.target.value);
+      });
+
+      // Изчисляване на сумите
+  const productTotal = cartItems.reduce((sum, item) => sum + parseFloat(item.priceBGN || 0), 0);
+  const productTotalEUR = cartItems.reduce((sum, item) => sum + parseFloat(item.priceEUR || 0), 0);
+  const extraBGN = parseInt(document.getElementById('extraBGN')?.value || 0);
+  const extraSt = parseInt(document.getElementById('extraSt')?.value || 0);
+  const extraTotal = extraBGN + (extraSt / 100);
+  const finalTotal = productTotal + extraTotal;
+  const finalTotalEUR = productTotalEUR + (extraTotal / 1.95583); // Конвертиране на допълнителната сума от BGN към EUR
+
+  document.getElementById('productTotal').textContent = productTotal.toFixed(2) + ' лв.';
+  document.getElementById('extraTotal').textContent = extraTotal.toFixed(2) + ' лв.';
+  document.getElementById('finalTotal').textContent = finalTotal.toFixed(2) + ' лв.';
+  document.getElementById('finalTotalEUR').textContent = finalTotalEUR.toFixed(2) + ' €';
+}
+
+    document.getElementById('extraBGN')?.addEventListener('input', renderCart);
+    document.getElementById('extraSt')?.addEventListener('input', renderCart);
+
+function showCheckout() {
+  const msg = document.getElementById("confirmationMessage");
+
+  if (cartItems.length === 0) {
+    msg.textContent = "❗ Количката е празна.";
+    msg.className = "confirmation-message show error";
+    setTimeout(() => {
+      msg.classList.remove("show");
+      msg.classList.add("hidden");
+    }, 4000);
+    return;
+  }
+
+      document.getElementById('checkoutSection').style.display = 'block';
+      document.getElementById('checkoutSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function toggleExtraCharge() {
+      const section = document.getElementById('extraChargeInputs');
+      section.style.display = section.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function submitOrder() {
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const createAccount = document.getElementById('createAccount').checked;
+      const pass1 = document.getElementById('password1').value;
+      const pass2 = document.getElementById('password2').value;
+      const payBtn = document.getElementById('payBtn');
+
+      const extraBGN = parseInt(document.getElementById('extraBGN').value || 0);
+      const extraSt = parseInt(document.getElementById('extraSt').value || 0);
+      const extraTotal = extraBGN + (extraSt / 100);
+
+const msg = document.getElementById("confirmationMessage");
+
+if (!name || !email || !phone || !address) {
+  msg.textContent = "❗ Моля, попълнете всички полета за доставка.";
+  msg.className = "confirmation-message show error";
+  setTimeout(() => {
+    msg.classList.remove("show");
+    msg.classList.add("hidden");
+  }, 4000);
+  return;
+}
+
+      if (createAccount) {
+        if (!pass1 || !pass2 || pass1 !== pass2) {
+          alert('❗ Паролите не съвпадат или липсват.');
+          return;
+        }
+      }
+
+      if (cartItems.length === 0) {
+        alert('❗ Количката е празна.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            email,
+            phone,
+            address,
+            items: cartItems,
+            extraCharge: extraTotal
+          })
+        });
+
+        const result = await res.json();
+        if (result.success) {
+          if (result.orderNumber) {
+            localStorage.setItem('lastOrderNumber', result.orderNumber);
+          }
+
+          const msg = document.getElementById("confirmationMessage");
+          msg.textContent = "✅ Данните за поръчката са приети. Моля, продължете с плащането.";
+          msg.classList.remove("hidden");
+          msg.classList.add("show");
+
+          payBtn.style.display = 'inline-block';
+          payBtn.scrollIntoView({ behavior: 'smooth' });
+
+          document.querySelector('button[onclick="submitOrder()"]').disabled = true;
+
+setTimeout(() => {
+  msg.classList.remove("show");
+  msg.classList.add("hidden");
+}, 4000);
+
+        } else {
+          alert('⚠️ Грешка при изпращане на поръчката.');
+        }
+      } catch (err) {
+        console.error('❌ Грешка при изпращане на поръчка:', err);
+        alert('⚠️ Неуспешно изпращане на поръчката.');
+      }
+    }
+
+    async function startCheckout() {
+      const cart = JSON.parse(localStorage.getItem('cartItems') || '[]');
+      const orderNumber = localStorage.getItem('lastOrderNumber') || 'UNKNOWN';
+
+      const extraBGN = parseInt(document.getElementById('extraBGN').value || 0);
+      const extraSt = parseInt(document.getElementById('extraSt').value || 0);
+      const extraTotal = extraBGN + (extraSt / 100);
+
+      try {
+        const res = await fetch('/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: cart,
+            orderNumber,
+            extraCharge: extraTotal
+          })
+        });
+
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert('Грешка при създаване на Stripe сесия');
+        }
+      } catch (err) {
+        console.error('Грешка при плащане:', err);
+        alert('Неуспешна обработка на плащането');
+      }
+    }
+
+    // Инициализация
+    document.addEventListener('DOMContentLoaded', function() {
+      // Възстановяване на броя от localStorage при зареждане
+      const savedCount = localStorage.getItem('cartItemCount');
+      if (savedCount) {
+        document.getElementById('cart-count').textContent = savedCount;
+        document.getElementById('cart-count-mobile').textContent = savedCount;
+      }
+      
+      renderCart();
+      
+      // Показване/скриване на полетата за парола
+      document.getElementById('createAccount').addEventListener('change', function() {
+        const display = this.checked ? 'block' : 'none';
+        document.getElementById('password1').style.display = display;
+        document.getElementById('password2').style.display = display;
+      });
+    });
+    // Активиране на бутона при отметване на чекбокса
+document.getElementById('termsCheckbox').addEventListener('change', function() {
+  document.getElementById('orderBtn').disabled = !this.checked;
+});
+  </script>
+
+  <div id="confirmationMessage" class="confirmation-message hidden"></div>
+<footer class="site-footer">
+  <div class="footer-links">
+    <a href="legal.html#terms">Условия за ползване</a>
+    <a href="legal.html#privacy">Политика за поверителност</a>
+    <a href="legal.html#cookies">Политика за бисквитки</a>
+    <a href="legal.html#terms">Контакт</a>
+  </div>
+  <div class="payment-icons">
+    <img src="https://img.icons8.com/color/48/visa.png" alt="Visa" />
+    <img src="https://img.icons8.com/color/48/mastercard.png" alt="MasterCard" />
+    <img src="https://img.icons8.com/color/48/paypal.png" alt="PayPal" />
+  </div>
+  <div class="copyright">
+    © 2025 YouPart.net – Всички права запазени.
+  </div>
+</footer>
+
+</body>
+</html>

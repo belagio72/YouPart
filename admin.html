@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <title>Админ панел</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+    #login-form, #admin-panel { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 8px #ccc; }
+    #admin-panel { display: none; }
+    .tab-nav button {
+      padding: 10px 20px;
+      margin-right: 5px;
+      border: none;
+      cursor: pointer;
+      background: #ddd;
+      border-radius: 5px 5px 0 0;
+    }
+    .tab-nav button.active { background: #fff; border-bottom: 2px solid white; font-weight: bold; }
+    .tab-content { display: none; border-top: 1px solid #ccc; padding-top: 15px; }
+    .tab-content.active { display: block; }
+    .order, .message, .account {
+      border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;
+      background: #f9f9f9; border-radius: 5px;
+    }
+    textarea { width: 100%; margin-top: 10px; }
+    .order-item {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+    .paid-badge {
+      color: green;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div style="margin-bottom: 20px; padding: 15px; background: #f8f8f8; border-radius: 12px; border: 1px solid #ccc;">
+    <h3>🎯 Създай линк към продукт от eBay</h3>
+    <input type="text" id="ebayInput" placeholder="Постави eBay линк тук" style="width: 50%; padding: 8px;">
+    <input type="number" id="customPrice" placeholder="Цена с надценка (BGN)" style="width: 20%; padding: 8px; margin-left: 10px;">
+    <button onclick="generateResolvedLink()" style="margin-left: 10px;">Генерирай линк</button>
+    <div id="resultLink" style="margin-top: 10px;"></div>
+  </div>
+
+
+
+<!-- 1. Формата за вход остава НЕПРОМЕНЕНА -->
+<div id="login-form">
+  <h2>Вход за администратор</h2>
+  <input id="username" placeholder="Потребителско име" /><br><br>
+  <input id="password" type="password" placeholder="Парола" /><br><br>
+  <button onclick="login()">Вход</button>
+  <p id="login-error" style="color: red;"></p>
+</div>
+
+<!-- 2. Админ панелът остава НЕПРОМЕНЕН (освен бутона за изход) -->
+<div id="admin-panel">
+  <h1>Админ панел</h1>
+  <button onclick="logout()" style="float:right;">Изход</button>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showTab('orders')">Поръчки</button>
+    <button class="tab-btn" onclick="showTab('archive')">Архив</button>
+    <button class="tab-btn" onclick="showTab('accounts')">Акаунти</button>
+    <button class="tab-btn" onclick="showTab('settings')">Настройки</button>
+  </div>
+
+  <!-- 3. Табовете остават НЕПРОМЕНЕНИ -->
+  <div id="orders" class="tab-content active">
+    <h2>Поръчки</h2>
+    <div id="orders-list"></div> <!-- Тук ще се показват поръчките -->
+  </div>
+
+  <div id="archive" class="tab-content">
+  <h2>Архивирани поръчки</h2>
+  <div id="archive-list">Зареждане...</div>
+</div>
+
+  <div id="accounts" class="tab-content">
+    <h2>Акаунти</h2>
+    <div id="accounts-list">Зареждане...</div>
+  </div>
+
+  <div id="settings" class="tab-content">
+    <label>Markup (%):</label>
+    <input type="number" id="markupInput" step="0.01">
+    <button onclick="saveMarkup()">Запази</button> 
+  </div>
+</div>
+
+<script>
+// Функция за зареждане на текущия markup при отваряне на страницата
+function loadMarkup() {
+  fetch('/api/settings')
+    .then(response => response.json())
+    .then(settings => {
+      if (settings.markup) {
+        // Преобразуване от множител към процент (1.2 → 20)
+        document.getElementById('markupInput').value = ((settings.markup - 1) * 100).toFixed(2);
+      }
+    })
+    .catch(error => console.error('Грешка при зареждане на настройки:', error));
+}
+
+// Функция за запазване на markup
+function saveMarkup() {
+  const markupInput = document.getElementById('markupInput');
+  const markupValue = parseFloat(markupInput.value);
+  
+  // Валидация
+  if (isNaN(markupValue)) {
+    alert('Моля въведете валидно число за markup');
+    return;
+  }
+
+  // Преобразуване от процент към множител (20 → 1.2)
+  const markupMultiplier = 1 + (markupValue / 100);
+
+  fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ markup: markupMultiplier })
+  })
+  .then(response => {
+    if (response.ok) {
+      alert('Настройките са запазени успешно!');
+      return response.json();
+    }
+    throw new Error('Грешка при запазване');
+  })
+  .catch(error => {
+    console.error('Грешка:', error);
+    alert('Грешка при запазване на настройките');
+  });
+}
+
+// Зареждане на настройките при отваряне на страницата
+document.addEventListener('DOMContentLoaded', loadMarkup);
+</script>
+
+<script>
+// 4. Функциите за вход/изход остават НЕПРОМЕНЕНИ
+async function login() {
+  const user = document.getElementById('username').value;
+  const pass = document.getElementById('password').value;
+  const res = await fetch('/admin_users.json');
+  const users = await res.json();
+
+  const found = users.find(u => u.username === user && u.password === pass);
+
+  if (found) {
+    localStorage.setItem('adminLoggedIn', 'true');
+    showAdminPanel();
+  } else {
+    document.getElementById('login-error').innerText = 'Грешно име или парола';
+  }
+}
+
+function logout() {
+  localStorage.removeItem('adminLoggedIn');
+  location.reload();
+}
+
+// 5. Функциите за табове остават НЕПРОМЕНЕНИ
+function showTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+
+  if (tabId === 'orders') fetchOrders();
+  if (tabId === 'tab-messages') fetchMessages();
+  if (tabId === 'accounts') fetchAccounts();
+  if (tabId === 'archive') fetchArchive();
+}
+
+function showAdminPanel() {
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+  fetchOrders();
+}
+
+// 6. НОВА Функция за зареждане на поръчките (променена)
+async function fetchOrders() {
+  const res = await fetch('/admin/orders?_=' + Date.now());
+  const data = await res.json();
+  const container = document.getElementById('orders-list');
+  container.innerHTML = '';
+
+  if (!data.orders || data.orders.length === 0) {
+    container.textContent = 'Няма поръчки.';
+    return;
+  }
+
+  data.orders.forEach(order => {
+    const itemsHtml = order.items.map(item => `
+      <div class="order-item">
+        <p><strong>Продукт:</strong> ${item.title || '—'}</p>
+        <p><strong>Цена:</strong> ${item.priceBGN || '—'} лв. (${item.priceEUR || '—'} €)</p>
+        <p><strong>Линк:</strong> <a href="${item.ebayLink}" target="_blank">${item.ebayLink || '—'}</a></p>
+        ${item.image ? `<img src="${item.image}" alt="Product Image" style="max-width:100px;">` : ''}
+      </div>
+    `).join('');
+
+    const div = document.createElement('div');
+    div.className = 'order';
+    div.innerHTML = `
+      <h3>Поръчка: ${order.orderNumber || '—'} 
+        
+      ${itemsHtml}
+      <p><strong>Име:</strong> ${order.name || '—'}</p>
+      <p><strong>Имейл:</strong> ${order.email || '—'}</p>
+      <p><strong>Телефон:</strong> ${order.phone || '—'}</p>
+      <p><strong>Адрес:</strong> ${order.address || '—'}</p>
+      <p><strong>Дата:</strong> ${order.date ? new Date(order.date).toLocaleString() : '—'}</p>
+      
+      <p><strong>Бележка:</strong></p>
+      ${order.paymentStatus === 'платена' ? '<span class="paid-badge">✅ Платено</span>' : ''}
+      <textarea onchange="updateNote('${order.orderNumber}', this.value)">${order.note || ''}</textarea>
+      
+      <br><br>
+      <button onclick="archiveOrder('${order.orderNumber}')">Архивирай</button>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+// 7. НОВИ функции за бележки и архивиране
+async function updateNote(orderNumber, note) {
+  try {
+    const res = await fetch('/admin/update-note', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderNumber, note })
+    });
+    const result = await res.json();
+    if (!result.success) {
+      alert('Грешка при запис на бележка!');
+    }
+  } catch (err) {
+    console.error('Грешка при запис на бележка:', err);
+  }
+}
+
+async function archiveOrder(orderNumber) {
+  if (!confirm('Сигурни ли сте, че искате да архивирате тази поръчка?')) return;
+  
+  try {
+    const res = await fetch('/admin/archive', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderNumber })
+    });
+    
+    const result = await res.json();
+    if (result.success) {
+      await fetchOrders();
+    } else {
+      alert('Грешка при архивиране: ' + (result.error || 'Неизвестна грешка'));
+    }
+  } catch (err) {
+    console.error('Грешка при архивиране:', err);
+    alert('Грешка при архивиране!');
+  }
+}
+
+// 8. Останалите функции (за съобщения и акаунти) остават НЕПРОМЕНЕНИ
+async function fetchMessages() {
+  const container = document.getElementById('messages-list');
+  container.innerHTML = 'Зареждане...';
+
+  try {
+    const res = await fetch('/admin/messages');
+    const data = await res.json();
+
+    if (!data.messages || data.messages.length === 0) {
+      container.innerHTML = 'Няма съобщения.';
+      return;
+    }
+
+    container.innerHTML = '';
+    data.messages.forEach(msg => {
+      const thread = document.createElement('div');
+      thread.className = 'message';
+      thread.innerHTML = `
+        <h3>${msg.name} (${msg.contact})</h3>
+        <div>${msg.messages.map(m => `<p><strong>${m.from === 'admin' ? 'Админ' : 'Клиент'}:</strong> ${m.text}</p>`).join('')}</div>
+        <textarea rows="2" placeholder="Вашият отговор..."></textarea>
+        <button onclick="replyTo('${msg.clientId}', this)">Изпрати отговор</button>
+      `;
+      container.appendChild(thread);
+    });
+  } catch (err) {
+    container.innerHTML = '⚠️ Грешка при зареждане на съобщенията.';
+    console.error(err);
+  }
+}
+
+async function replyTo(clientId, btn) {
+  const textarea = btn.previousElementSibling;
+  const text = textarea.value.trim();
+  if (!text) return alert('Моля, въведете съобщение.');
+
+  const res = await fetch('/admin/reply', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ clientId, text })
+  });
+
+  const result = await res.json();
+  if (result.success) {
+    textarea.value = '';
+    await fetchMessages();
+  } else {
+    alert('Грешка при изпращане на отговор.');
+  }
+}
+
+async function fetchAccounts() {
+  const res = await fetch('/admin_users.json');
+  const users = await res.json();
+  const container = document.getElementById('accounts-list');
+  container.innerHTML = '';
+
+  users.forEach(u => {
+    const div = document.createElement('div');
+    div.className = 'account';
+    div.innerHTML = `
+      <h3>${u.username}</h3>
+      <p><strong>Парола:</strong> ${u.password}</p>
+    `;
+    container.appendChild(div);
+  });
+}
+
+async function fetchArchive() {
+  const container = document.getElementById('archive-list');
+  container.innerHTML = 'Зареждане...';
+
+  try {
+    const res = await fetch('/admin/archive');
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    
+    const data = await res.json();
+    
+    // Проверка дали data.orders съществува
+    const orders = data.orders || [];
+    
+    if (orders.length === 0) {
+      container.innerHTML = 'Няма архивирани поръчки.';
+      return;
+    }
+
+    container.innerHTML = '';
+    orders.forEach(order => {
+      const itemsHtml = (order.items || []).map(item => `
+        <div class="order-item">
+          <p><strong>Продукт:</strong> ${item.title || '—'}</p>
+          <p><strong>Цена:</strong> ${item.priceBGN || '—'} лв.</p>
+          <p><strong>Линк:</strong> <a href="${item.ebayLink || '#'}" target="_blank">${item.ebayLink || '—'}</a></p>
+          ${item.image ? `<img src="${item.image}" style="max-width:100px;">` : ''}
+        </div>
+      `).join('');
+
+      const div = document.createElement('div');
+      div.className = 'order';
+      div.innerHTML = `
+        <h3>Поръчка: ${order.orderNumber || '—'}</h3>
+        ${itemsHtml}
+        <p><strong>Дата:</strong> ${order.date ? new Date(order.date).toLocaleString() : '—'}</p>
+        ${order.note ? `<p><strong>Бележка:</strong> ${order.note}</p>` : ''}
+      `;
+      container.appendChild(div);
+    });
+  } catch (err) {
+    console.error('Грешка при зареждане на архива:', err);
+    container.innerHTML = '⚠️ Грешка при зареждане на архива.';
+  }
+}
+
+// 9. Проверка за логин при зареждане остава НЕПРОМЕНЕНА
+if (localStorage.getItem('adminLoggedIn') === 'true') {
+  showAdminPanel();
+  fetchOrders();
+}
+async function loadSettings() {
+  const res = await fetch('/api/settings');
+  const data = await res.json();
+  document.getElementById('markupInput').value = data.markup;
+}
+
+async function saveMarkup() {
+  const markup = parseFloat(document.getElementById('markupInput').value);
+  console.log('📤 Изпращам markup:', markup);
+
+  const res = await fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ markup })
+  });
+
+  const text = await res.text(); // 👈 прочитаме го като текст (не директно JSON)
+  console.log('📥 Отговор от сървъра:', text);
+
+  try {
+    const result = JSON.parse(text);
+    if (result.success) {
+      alert('✅ Настройката е запазена!');
+    } else {
+      alert('❌ Грешка при запис: ' + result.error);
+    }
+  } catch (e) {
+    console.error('❌ Грешка при JSON.parse:', e.message);
+    alert('❌ Невалиден отговор от сървъра');
+  }
+}
+
+
+</script>
+
+  <script>
+    if (!localStorage.getItem('adminLoggedIn')) {
+      document.body.innerHTML = `
+        <div style="padding: 20px;">
+          <h2>🔐 Админ вход</h2>
+          <input id="adminUser" placeholder="Потребителско име"><br><br>
+          <input id="adminPass" type="password" placeholder="Парола"><br><br>
+          <button onclick="loginAdmin()">Вход</button>
+        </div>
+      `;
+    }
+
+    async function loginAdmin() {
+      const user = document.getElementById('adminUser').value.trim();
+      const pass = document.getElementById('adminPass').value.trim();
+      try {
+        const res = await fetch('/admin_users.json');
+        const users = await res.json();
+        const match = users.find(u => u.username === user && u.password === pass);
+        if (match) {
+          localStorage.setItem('adminLoggedIn', 'true');
+          location.reload();
+        } else {
+          alert('❌ Невалидни данни за вход');
+        }
+      } catch (err) {
+        console.error('Грешка при зареждане на потребителите:', err);
+        alert('⚠️ Проблем при проверка на вход');
+      }
+    }
+  </script>
+
+  <script>
+function generateResolvedLink() {
+  const ebayLink = document.getElementById('ebayInput').value.trim();
+  const customPrice = parseFloat(document.getElementById('customPrice').value.trim());
+
+  if (!ebayLink.includes('/itm/')) {
+    alert('❌ Моля въведи валиден eBay линк (съдържащ /itm/).');
+    return;
+  }
+
+  fetch(`/api/resolve-id?url=${encodeURIComponent(ebayLink)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        document.getElementById('resultLink').innerHTML = `⚠️ ${data.error}`;
+        return;
+      }
+
+      const { itemId, title, priceBGN, query, region } = data;
+      const finalPrice = !isNaN(customPrice) ? customPrice.toFixed(2) : priceBGN;
+
+      const finalUrl = `product.html?id=${encodeURIComponent(itemId)}&title=${encodeURIComponent(title)}&priceBGN=${finalPrice}&query=${encodeURIComponent(query)}&region=${region}`;
+      const fullUrl = `${window.location.origin}/${finalUrl}`;
+
+      document.getElementById('resultLink').innerHTML = `
+        ✅ Линк към продукта:<br>
+        <a href="${finalUrl}" target="_blank">${fullUrl}</a><br><br>
+        <button onclick="copyToClipboard('${fullUrl}')">📋 Копирай линка</button>
+      `;
+    })
+    .catch(err => {
+      console.error('❌ Грешка при извличане на itemId:', err);
+      document.getElementById('resultLink').innerText = '⚠️ Възникна грешка при обработка на линка.';
+    });
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    alert('🔗 Линкът е копиран!');
+  });
+}
+</script>
+
+</body>
+</html>
+
+
+
+
+
+

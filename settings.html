@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Настройки</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #settingsForm { padding: 20px; border: 1px solid #ccc; border-radius: 8px; background-color: #f2f2f2; max-width: 600px; margin-bottom: 20px; }
+    #settingsForm input[type="text"], #settingsForm input[type="number"] { width: 100%; padding: 8px; margin-bottom: 10px; }
+    #settingsForm label { font-weight: bold; display: block; margin-top: 10px; }
+    #settingsForm button { padding: 10px 20px; font-size: 16px; }
+    #currentSettings { background: #e9e9e9; padding: 15px; border-radius: 8px; border: 1px solid #bbb; max-width: 600px; }
+    #currentSettings h2 { margin-top: 0; }
+    #currentSettings ul { padding-left: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Настройки на сайта</h1>
+
+  <div id="settingsForm">
+    <form onsubmit="return saveSettings()">
+      <label for="markup">Процент надценка (напр. 1.2 за 20%)</label>
+      <input type="number" step="0.01" id="markup" name="markup" required>
+
+      <label for="allowedDomains">Допустими домейни (напр. .co.uk, .de, .fr)</label>
+      <input type="text" id="allowedDomains" name="allowedDomains">
+
+      <label for="excludedSellerCountries">Изключени държави на продавачи (ISO кодове)</label>
+      <input type="text" id="excludedSellerCountries" name="excludedSellerCountries">
+
+      <label><input type="checkbox" id="onlyShipToGB"> Показвай само обяви с доставка до UK</label>
+
+      <label><input type="checkbox" id="enableUrlFilter"> Активирай филтър по URL</label>
+
+      <label><input type="checkbox" id="enableLocationFilter"> Активирай филтър по локация</label>
+
+      <button type="submit">💾 Запази</button>
+      <p id="saveStatus" style="color:green; display:none;">✔️ Запазено успешно!</p>
+    </form>
+  </div>
+
+  <div id="currentSettings">
+    <h2>Текущи настройки</h2>
+    <ul id="settingsPreview"></ul>
+  </div>
+
+  <script>
+    function renderPreview(settings) {
+      const list = document.getElementById('settingsPreview');
+      list.innerHTML = '';
+      list.innerHTML += `<li>Надценка: <strong>${settings.markup}</strong></li>`;
+      list.innerHTML += `<li>Допустими домейни: <strong>${(settings.allowedDomains || []).join(', ')}</strong></li>`;
+      list.innerHTML += `<li>Изключени държави: <strong>${(settings.excludedSellerCountries || []).join(', ')}</strong></li>`;
+      list.innerHTML += `<li>Само доставка до UK: <strong>${settings.onlyShipToGB ? 'Да' : 'Не'}</strong></li>`;
+      list.innerHTML += `<li>Филтър по URL: <strong>${settings.enableUrlFilter ? 'Активен' : 'Изключен'}</strong></li>`;
+      list.innerHTML += `<li>Филтър по локация: <strong>${settings.enableLocationFilter ? 'Активен' : 'Изключен'}</strong></li>`;
+    }
+
+    async function loadSettings() {
+      try {
+        const res = await fetch('/admin/settings');
+        const settings = await res.json();
+
+        document.getElementById('markup').value = settings.markup || 1.2;
+        document.getElementById('allowedDomains').value = (settings.allowedDomains || []).join(', ');
+        document.getElementById('excludedSellerCountries').value = (settings.excludedSellerCountries || []).join(', ');
+        document.getElementById('onlyShipToGB').checked = settings.onlyShipToGB || false;
+        document.getElementById('enableUrlFilter').checked = settings.enableUrlFilter || false;
+        document.getElementById('enableLocationFilter').checked = settings.enableLocationFilter || false;
+
+        renderPreview(settings);
+      } catch (err) {
+        console.error('⚠️ Грешка при зареждане на настройки:', err);
+      }
+    }
+
+    async function saveSettings() {
+      const markup = parseFloat(document.getElementById('markup').value);
+      if (isNaN(markup) || markup <= 0) {
+        alert('❌ Моля въведете валиден процент надценка.');
+        return false;
+      }
+
+      const allowedDomains = document.getElementById('allowedDomains').value.split(',').map(d => d.trim()).filter(Boolean);
+      const excludedSellerCountries = document.getElementById('excludedSellerCountries').value.split(',').map(c => c.trim().toUpperCase()).filter(Boolean);
+
+      const settings = {
+        markup,
+        allowedDomains,
+        excludedSellerCountries,
+        onlyShipToGB: document.getElementById('onlyShipToGB').checked,
+        enableUrlFilter: document.getElementById('enableUrlFilter').checked,
+        enableLocationFilter: document.getElementById('enableLocationFilter').checked
+      };
+
+      try {
+        await fetch('/admin/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(settings)
+        });
+        document.getElementById('saveStatus').style.display = 'block';
+        setTimeout(() => document.getElementById('saveStatus').style.display = 'none', 2000);
+        renderPreview(settings);
+      } catch (err) {
+        console.error('⚠️ Грешка при запазване на настройки:', err);
+        alert('❌ Неуспешно запазване на настройките.');
+      }
+      return false;
+    }
+
+    loadSettings();
+  </script>
+</body>
+</html>
+
+
+
+
+
+

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <title>Съобщения от клиенти</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    .message {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+    .reply {
+      margin-top: 10px;
+    }
+    textarea {
+      width: 100%;
+      height: 60px;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 5px;
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Съобщения от клиенти</h1>
+  <div id="messages"></div>
+
+  <script>
+    async function fetchMessages() {
+      const res = await fetch('/api/messages');
+      const data = await res.json();
+      const container = document.getElementById('messages');
+      container.innerHTML = '';
+
+      data.reverse().forEach(msg => {
+        const div = document.createElement('div');
+        div.className = 'message';
+        div.innerHTML = `
+          <strong>Име:</strong> ${msg.name}<br>
+          <strong>Контакт:</strong> ${msg.contact}<br>
+          <strong>Съобщение:</strong> ${msg.message}<br>
+          <strong>Дата:</strong> ${new Date(msg.date).toLocaleString()}<br>
+          <div class="reply">
+            <label>Отговор:</label><br>
+            <textarea id="reply-${msg.id}" placeholder="Въведи отговор...">${msg.reply || ''}</textarea><br>
+            <button onclick="sendReply(${msg.id})">Изпрати</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    async function sendReply(id) {
+      const textarea = document.getElementById(`reply-${id}`);
+      const reply = textarea.value.trim();
+      if (!reply) return alert("Моля, въведи отговор!");
+
+      const res = await fetch('/api/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, reply })
+      });
+
+      const result = await res.json();
+      if (result.success) {
+        alert("✅ Отговор изпратен!");
+      } else {
+        alert("❌ Грешка при изпращане.");
+      }
+    }
+
+    fetchMessages();
+  </script>
+</body>
+</html>

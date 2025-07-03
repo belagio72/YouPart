@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="bg">
+  <link rel="stylesheet" href="style.css">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Продукт | YouPart</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Sansation&display=swap" rel="stylesheet">
+  
+</head>
+<body>
+  <!-- Десктоп хедър -->
+  <header id="desktop-header">
+    <div class="header-container">
+      <div class="logo-container">
+        <img src="youpart logo.png" alt="Лого" />
+        <div class="logo-text">
+          <h1><span class="red-word">Авточасти</span> втора употреба<br>от Европа и Северна Америка</h1>
+        </div>
+      </div>
+      <div class="header-right">
+        
+        <div id="cart-container" class="cart-container">
+          <a href="cart.html" class="cart-link">
+            <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+              <path d="M160 400a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm256 0a48 48 0 1 0 48 48 48 48 0 0 0-48-48zM165.1 288h230.7a48 48 0 0 0 45.3-30.5l65.9-165.2A16 16 0 0 0 493.3 80H128l-12.4-37.1A16 16 0 0 0 100.3 32H16A16 16 0 0 0 0 48v16a16 16 0 0 0 16 16h66.7l94 281.1A80 80 0 0 0 256 416h144a16 16 0 0 0 0-32H256a48 48 0 0 1-45.3-30.5l-8.6-21.5z"/>
+            </svg>
+            <span id="cart-count" class="cart-count">0</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+
+  <!-- Мобилен хедър -->
+<div id="mobile-header">
+  <div class="mobile-header-top">
+  <span><span style="color:#F72616;">Части</span> втора употреба от Европа и САЩ</span>
+</div>
+
+  <div class="mobile-header-bottom">
+    <img src="youpart logo.png" alt="Лого">
+    <div class="mobile-header-right">
+      <a href="cart.html" class="cart-icon-mobile">
+        <svg style="width:26px;height:26px;fill:black;" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <path d="M160 400a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm256 0a48 48 0 1 0 48 48 48 48 0 0 0-48-48zM165.1 288h230.7a48 48 0 0 0 45.3-30.5l65.9-165.2A16 16 0 0 0 493.3 80H128l-12.4-37.1A16 16 0 0 0 100.3 32H16A16 16 0 0 0 0 48v16a16 16 0 0 0 16 16h66.7l94 281.1A80 80 0 0 0 256 416h144a16 16 0 0 0 0-32H256a48 48 0 0 1-45.3-30.5l-8.6-21.5z"/>
+        </svg>
+        <span id="cart-count-mobile">0</span>
+      </a>
+      
+    </div>
+  </div>
+</div>
+<div class="custom-buttons">
+  <button class="info-btn" onclick="window.location.href='index.html'">Начало</button>
+  <button class="info-btn" onclick="location.href='index.html#how-it-works'">Как работи?</button>
+<button class="info-btn" onclick="location.href='index.html#delivery-returns'">Доставка и връщане</button>
+</div>
+
+
+
+  <main class="main-container">
+    <div class="product-section">
+      <h1 class="product-title" id="title">Зареждане на продукта...</h1>
+      
+      <div class="product-images" id="product-images"></div>
+      
+      <!-- Промяна в product.html -->
+<div class="product-info">
+  <div class="price-section">
+    <p><strong>Цена:</strong></p>
+    <p class="price-main" id="price">—</p>
+    <p class="price-secondary" id="priceEUR"></p>
+  </div>
+  
+  <div class="product-description" id="description"></div>
+</div>
+      
+      <div class="action-buttons">
+  <button class="btn btn-secondary" onclick="goBackToResults()">← Назад към резултатите</button>
+  
+  <div class="cart-delivery-group">
+    <button class="btn btn-primary" id="addToCartBtn">Добави в количката</button>
+    <a href="index.html#delivery-returns" class="delivery-info-link">
+      📦 <span>Виж цена на доставка</span>
+    </a>
+  </div>
+</div>
+
+
+      <p class="success-message" id="successMsg">✅ Продуктът беше добавен в количката.</p>
+      
+      <a id="ebayLink" href="#" target="_blank" class="btn btn-secondary" style="display: none;">
+        Виж в eBay
+      </a>
+
+    </div>
+  </main>
+
+  <!-- Lightbox структура -->
+  <div id="lightbox">
+    <button id="prevBtn" class="lightbox-nav-btn">❮</button>
+    <img id="lightbox-img">
+    <button id="nextBtn" class="lightbox-nav-btn">❯</button>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemId = urlParams.get('id');
+    const title = decodeURIComponent(urlParams.get('title') || '');
+    const price = decodeURIComponent(urlParams.get('priceBGN') || '—');
+
+    async function loadProduct() {
+      try {
+        const res = await fetch(`/product?id=${encodeURIComponent(itemId)}&title=${encodeURIComponent(title)}&priceBGN=${encodeURIComponent(price)}`);
+        const data = await res.json();
+
+        // Показваме заглавието от URL параметъра или от данните
+        const displayTitle = title || data.title || 'Продукт';
+        document.getElementById('title').textContent = displayTitle;
+
+        document.getElementById('price').textContent = `${data.price} ${data.currency}`;
+        if (data.priceEUR) {
+          document.getElementById('priceEUR').textContent = `(${data.priceEUR} €)`;
+        }
+
+        if (data.description) {
+          document.getElementById('description').textContent = data.description;
+        } else {
+          document.getElementById('description').textContent = "Няма допълнително описание за този продукт.";
+        }
+
+        document.getElementById('ebayLink').href = data.ebayLink || '#';
+
+        const imagesContainer = document.getElementById('product-images');
+        if (data.images && data.images.length > 0) {
+          data.images.forEach(url => {
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = displayTitle;
+            imagesContainer.appendChild(img);
+          });
+        } else {
+          imagesContainer.innerHTML = '<p>Няма налични снимки за този продукт</p>';
+        }
+
+        document.getElementById('addToCartBtn').onclick = function () {
+          const product = {
+            itemId: itemId,
+            title: displayTitle,
+            priceBGN: data.price,
+            priceEUR: data.priceEUR,
+            ebayLink: data.ebayLink,
+            image: data.images && data.images.length > 0 ? data.images[0] : ''
+          };
+
+          let cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+          cartItems.push(product);
+          localStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+          document.getElementById('successMsg').style.display = 'block';
+          updateCartCount();
+        };
+
+        setupLightbox();
+
+      } catch (err) {
+        console.error('⚠️ Грешка при зареждане на продукта:', err);
+        document.getElementById('title').textContent = '⚠️ Проблем с зареждането на продукта';
+        document.getElementById('description').textContent = 'Моля, опитайте отново по-късно или се свържете с нас.';
+      }
+    }
+
+    function setupLightbox() {
+      let currentImageIndex = 0;
+      let imageUrls = [];
+
+      document.getElementById('product-images').addEventListener('click', function(e) {
+        if (e.target.tagName === 'IMG') {
+          imageUrls = Array.from(document.querySelectorAll('#product-images img')).map(img => img.src);
+          currentImageIndex = imageUrls.indexOf(e.target.src);
+          showLightboxImage();
+        }
+      });
+
+      function showLightboxImage() {
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        lightboxImg.src = imageUrls[currentImageIndex];
+        lightbox.style.display = 'flex';
+      }
+
+      document.getElementById('lightbox').addEventListener('click', function(e) {
+        if (e.target.id === 'lightbox' || e.target.classList.contains('lightbox-nav-btn')) {
+          return;
+        }
+        this.style.display = 'none';
+      });
+
+      document.getElementById('prevBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        currentImageIndex = (currentImageIndex - 1 + imageUrls.length) % imageUrls.length;
+        showLightboxImage();
+      });
+
+      document.getElementById('nextBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        currentImageIndex = (currentImageIndex + 1) % imageUrls.length;
+        showLightboxImage();
+      });
+
+      document.addEventListener('keydown', function(e) {
+        const lightbox = document.getElementById('lightbox');
+        if (lightbox.style.display !== 'flex') return;
+        
+        if (e.key === 'ArrowLeft') {
+          currentImageIndex = (currentImageIndex - 1 + imageUrls.length) % imageUrls.length;
+          showLightboxImage();
+        } else if (e.key === 'ArrowRight') {
+          currentImageIndex = (currentImageIndex + 1) % imageUrls.length;
+          showLightboxImage();
+        } else if (e.key === 'Escape') {
+          lightbox.style.display = 'none';
+        }
+      });
+    }
+
+    function goBackToResults() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const query = urlParams.get('query');
+      const region = urlParams.get('region') || 'europe';
+
+      if (!query || query.toLowerCase() === 'custom') {
+        window.location.href = `index.html?region=${region}`;
+      } else {
+        window.location.href = `index.html?query=${encodeURIComponent(query)}&region=${region}`;
+      }
+    }
+
+    function updateCartCount() {
+      const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+      document.getElementById('cart-count').textContent = cartItems.length;
+      document.getElementById('cart-count-mobile').textContent = cartItems.length;
+    }
+
+    // Зареждане на продукта и брояча на количката
+    document.addEventListener('DOMContentLoaded', function() {
+      loadProduct();
+      updateCartCount();
+    });
+  </script>
+<footer class="site-footer">
+  <div class="footer-links">
+    <a href="legal.html#terms">Условия за ползване</a>
+    <a href="legal.html#privacy">Политика за поверителност</a>
+    <a href="legal.html#cookies">Политика за бисквитки</a>
+    <a href="legal.html#terms">Контакт</a>
+  </div>
+  <div class="payment-icons">
+    <img src="https://img.icons8.com/color/48/visa.png" alt="Visa" />
+    <img src="https://img.icons8.com/color/48/mastercard.png" alt="MasterCard" />
+    <img src="https://img.icons8.com/color/48/paypal.png" alt="PayPal" />
+  </div>
+  <div class="copyright">
+    © 2025 YouPart.net – Всички права запазени.
+  </div>
+</footer>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+

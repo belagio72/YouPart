@@ -1,0 +1,2194 @@
+[
+  {
+    "bg": "Спирачна система",
+    "en": "",
+    "children": [
+      {
+        "bg": "Спирачни дискове",
+        "en": "Brake discs"
+      },
+      {
+        "bg": "Накладки",
+        "en": "Brake pads"
+      },
+      {
+        "bg": "Спирачен апарат",
+        "en": "Brake caliper"
+      },
+      {
+        "bg": "Ремонтен комплект спирачен апарат",
+        "en": "Brake caliper repair kit"
+      },
+      {
+        "bg": "Спирачен маркуч",
+        "en": "Brake hose"
+      },
+      {
+        "bg": "Жило ръчна спирачка",
+        "en": "Handbrake cable"
+      },
+      {
+        "bg": "Спирачна помпа",
+        "en": "Brake pump"
+      },
+      {
+        "bg": "Регулатор на спирачната сила",
+        "en": "Brake force regulator"
+      },
+      {
+        "bg": "Вакуум помпа",
+        "en": "Vacuum pump"
+      },
+      {
+        "bg": "Ръчна спирачка",
+        "en": "Hand brake"
+      },
+      {
+        "bg": "Датчик за накладки",
+        "en": "Pad sensor"
+      },
+      {
+        "bg": "Спирачни челюсти",
+        "en": "Brake shoes"
+      },
+      {
+        "bg": "Ремонтен комплект спирачна помпа",
+        "en": "Brake master cylinder repair kit"
+      },
+      {
+        "bg": "Накладки ръчна спирачка",
+        "en": "Handbrake pads"
+      },
+      {
+        "bg": "Държач спирачен апарат",
+        "en": "Brake caliper holder"
+      },
+      {
+        "bg": "Спирачен барабан",
+        "en": "Brake drum"
+      },
+      {
+        "bg": "Сервоусилвател",
+        "en": "Power steering"
+      },
+      {
+        "bg": "Уплътнение вакуум помпа",
+        "en": "Vacuum pump seal"
+      },
+      {
+        "bg": "Казанче спирачна течност",
+        "en": "Brake fluid reservoir"
+      },
+      {
+        "bg": "Спирачно цилиндърче",
+        "en": "Brake cylinder"
+      },
+      {
+        "bg": "Педал спирачка",
+        "en": "Brake pedal"
+      },
+      {
+        "bg": "Датчик спирачна течност",
+        "en": "Brake fluid sensor"
+      }
+    ]
+  },
+  {
+    "bg": "Ходова част",
+    "en": "",
+    "children": [
+      {
+        "bg": "Шарнир",
+        "en": "Ball Joint"
+      },
+      {
+        "bg": "Носач",
+        "en": "Control arm"
+      },
+      {
+        "bg": "Тампон на носача",
+        "en": "Control arm bushing"
+      },
+      {
+        "bg": "Биелетка",
+        "en": "Tie rod"
+      },
+      {
+        "bg": "Тампон стабилизираща щанга",
+        "en": "Stabilizer bar cushion"
+      },
+      {
+        "bg": "Тампон заден мост",
+        "en": "Rear axle cushion"
+      },
+      {
+        "bg": "Лагер главина",
+        "en": "Wheel hub bearing"
+      },
+      {
+        "bg": "Торсион",
+        "en": "Torsion bar"
+      },
+      {
+        "bg": "Шенкел",
+        "en": "Control arm"
+      },
+      {
+        "bg": "Шенкелен болт",
+        "en": "Control arm bolt"
+      },
+      {
+        "bg": "Главина колело",
+        "en": "Wheel hub"
+      },
+      {
+        "bg": "Други части ходова част",
+        "en": "Other chassis parts"
+      },
+      {
+        "bg": "Ексцентричен болт",
+        "en": "Eccentric bolt"
+      },
+      {
+        "bg": "Реглажна щанга",
+        "en": "Adjusting rod"
+      },
+      {
+        "bg": "Комплект окачване носачи",
+        "en": "Suspension bracket kit"
+      },
+      {
+        "bg": "Колесен болт",
+        "en": "Wheel bolt"
+      },
+      {
+        "bg": "Окачване на моста",
+        "en": "Axle suspension"
+      },
+      {
+        "bg": "Шенкелна ос",
+        "en": "Control arm shaft"
+      },
+      {
+        "bg": "Ремонтен комплект шенкел",
+        "en": "Control arm repair kit"
+      }
+    ]
+  },
+  {
+    "bg": "Съединител и маховик",
+    "en": "",
+    "children": [
+      {
+        "bg": "Съединител комплект",
+        "en": "Clutch kit"
+      },
+      {
+        "bg": "Маховик",
+        "en": "Flywheel"
+      },
+      {
+        "bg": "Долна помпа за съединител",
+        "en": "Clutch slave cylinder"
+      },
+      {
+        "bg": "Горна помпа за съединител",
+        "en": "Clutch master cylinder"
+      },
+      {
+        "bg": "Лагер помпа",
+        "en": "Release bearing"
+      },
+      {
+        "bg": "Ремонтен комплект долна помпа",
+        "en": "Slave cylinder repair kit"
+      },
+      {
+        "bg": "Ремонтен комплект горна помпа",
+        "en": "Master cylinder repair kit"
+      },
+      {
+        "bg": "Жило за съединител",
+        "en": "Clutch cable"
+      },
+      {
+        "bg": "Притискателен диск",
+        "en": "Pressure plate"
+      },
+      {
+        "bg": "Феродов диск",
+        "en": "Friction disc"
+      },
+      {
+        "bg": "Аксиален лагер",
+        "en": "Thrust bearing"
+      },
+      {
+        "bg": "Педал съединител",
+        "en": "Clutch pedal"
+      },
+      {
+        "bg": "Вилка за съединител",
+        "en": "Clutch fork"
+      },
+      {
+        "bg": "Комплект винтове съединител",
+        "en": "Clutch bolt kit"
+      },
+      {
+        "bg": "Болтове за маховик",
+        "en": "Flywheel bolts"
+      }
+    ]
+  },
+  {
+    "bg": "Кормилна система",
+    "en": "",
+    "children": [
+      {
+        "bg": "Външен накрайник",
+        "en": "Outer tie rod end"
+      },
+      {
+        "bg": "Вътрешен накрайник",
+        "en": "Inner tie rod end"
+      },
+      {
+        "bg": "Маншон кормилна рейка",
+        "en": "Steering rack boot"
+      },
+      {
+        "bg": "Кормилна щанга",
+        "en": "Steering rod"
+      },
+      {
+        "bg": "Кормилна рейка",
+        "en": "Steering rack"
+      },
+      {
+        "bg": "Хидравлична помпа",
+        "en": "Power steering pump"
+      },
+      {
+        "bg": "Шайба хидравлична помпа",
+        "en": "Power steering pump washer"
+      },
+      {
+        "bg": "Казанче хидравлична течност",
+        "en": "Power steering fluid reservoir"
+      },
+      {
+        "bg": "Паразитен хебел",
+        "en": "Idler pulley"
+      },
+      {
+        "bg": "Втулка паразитен хебел",
+        "en": "Idler pulley bushing"
+      },
+      {
+        "bg": "Амортисьор кормилно управление",
+        "en": "Steering damper"
+      },
+      {
+        "bg": "Електромотор кормилна рейка",
+        "en": "Steering rack motor"
+      },
+      {
+        "bg": "Клапан сервоуправление",
+        "en": "Servo valve"
+      },
+      {
+        "bg": "Датчик налягане хидравлика",
+        "en": "Hydraulic pressure sensor"
+      }
+    ]
+  },
+  {
+    "bg": "Задвижване",
+    "en": "",
+    "children": [
+      {
+        "bg": "Каре полуоска",
+        "en": "Drive shaft carrier"
+      },
+      {
+        "bg": "Маншон на каре",
+        "en": "Drive shaft boot"
+      },
+      {
+        "bg": "Полуоска",
+        "en": "Half shaft"
+      },
+      {
+        "bg": "Семеринг полуоска",
+        "en": "Half shaft seal"
+      },
+      {
+        "bg": "Трипод полуоска",
+        "en": "Tripod joint"
+      },
+      {
+        "bg": "Лагер полуоска",
+        "en": "Half shaft bearing"
+      },
+      {
+        "bg": "Семеринг диференциал",
+        "en": "Differential seal"
+      },
+      {
+        "bg": "Висящ лагер",
+        "en": "Carrier bearing"
+      },
+      {
+        "bg": "Кардан",
+        "en": "Propeller shaft"
+      },
+      {
+        "bg": "Каре кардан",
+        "en": "Propeller shaft carrier"
+      },
+      {
+        "bg": "Диференциал",
+        "en": "Differential"
+      },
+      {
+        "bg": "Пробка диференциал",
+        "en": "Differential plug"
+      },
+      {
+        "bg": "Раздатъчна кутия",
+        "en": "Transfer case"
+      },
+      {
+        "bg": "Блокаж на диференциала",
+        "en": "Differential lock"
+      }
+    ]
+  },
+  {
+    "bg": "Ремъчно задвижване",
+    "en": "",
+    "children": [
+      {
+        "bg": "Комплект ангренажен ремък",
+        "en": "Timing belt kit"
+      },
+      {
+        "bg": "Ангренажен ремък",
+        "en": "Timing belt"
+      },
+      {
+        "bg": "Обтегач ангренажен ремък",
+        "en": "Timing belt tensioner"
+      },
+      {
+        "bg": "Обтяжна ролка ангренажен ремък",
+        "en": "Timing belt idler pulley"
+      },
+      {
+        "bg": "Паразитна ролка ангренажен ремък",
+        "en": "Timing belt tensioner pulley"
+      },
+      {
+        "bg": "Капак ангренажен ремък",
+        "en": "Timing belt cover"
+      },
+      {
+        "bg": "Комплект пистов ремък",
+        "en": "V-belt kit"
+      },
+      {
+        "bg": "Пистов ремък",
+        "en": "V-belt"
+      },
+      {
+        "bg": "Обтяжна ролка пистов ремък",
+        "en": "V-belt tensioner pulley"
+      },
+      {
+        "bg": "Паразитна ролка пистов ремък",
+        "en": "V-belt idler pulley"
+      },
+      {
+        "bg": "Обтегач пистов ремък",
+        "en": "V-belt tensioner"
+      },
+      {
+        "bg": "Трапецовиден ремък",
+        "en": "Serpentine belt"
+      },
+      {
+        "bg": "Обтегач трапецовиден ремък",
+        "en": "Serpentine belt tensioner"
+      },
+      {
+        "bg": "CVT ремък",
+        "en": "CVT belt"
+      },
+      {
+        "bg": "Гъвкава муфа",
+        "en": "Flexible coupling"
+      }
+    ]
+  },
+  {
+    "bg": "Части за двигател",
+    "en": "",
+    "children": [
+      {
+        "bg": "Турбо",
+        "en": "Turbocharger"
+      },
+      {
+        "bg": "Картридж турбо",
+        "en": "Turbocharger cartridge"
+      },
+      {
+        "bg": "Моторче празен ход",
+        "en": "Idle control valve"
+      },
+      {
+        "bg": "Клапан на турбо",
+        "en": "Turbo valve"
+      },
+      {
+        "bg": "Монтажен комплект турбо",
+        "en": "Turbo installation kit"
+      },
+      {
+        "bg": "Интеркулер",
+        "en": "Intercooler"
+      },
+      {
+        "bg": "Жило за газ",
+        "en": "Throttle cable"
+      },
+      {
+        "bg": "Капак на клапаните",
+        "en": "Valve cover"
+      },
+      {
+        "bg": "Цилиндрова глава",
+        "en": "Cylinder head"
+      },
+      {
+        "bg": "Всмукателен колектор",
+        "en": "Intake manifold"
+      },
+      {
+        "bg": "Педал на газта",
+        "en": "Accelerator pedal"
+      },
+      {
+        "bg": "Пул регулиране на клапани",
+        "en": "Valve adjustment tool"
+      },
+      {
+        "bg": "Кобилици",
+        "en": "Rocker arms"
+      },
+      {
+        "bg": "Плъзгач верига",
+        "en": "Chain guide"
+      },
+      {
+        "bg": "Обтегач ангренажна верига",
+        "en": "Timing chain tensioner"
+      },
+      {
+        "bg": "Разпределителен вал",
+        "en": "Camshaft"
+      },
+      {
+        "bg": "Ангренажна верига",
+        "en": "Timing chain"
+      },
+      {
+        "bg": "Зъбно колело",
+        "en": "Sprocket"
+      },
+      {
+        "bg": "Вал кобилици",
+        "en": "Rocker arm shaft"
+      },
+      {
+        "bg": "Дефазатор",
+        "en": "Variable valve timing solenoid"
+      },
+      {
+        "bg": "Гарнитура ангренаж",
+        "en": "Timing gasket"
+      },
+      {
+        "bg": "Ангренажен капак",
+        "en": "Timing cover"
+      },
+      {
+        "bg": "Повдигачи на клапаните",
+        "en": "Valve lifters"
+      },
+      {
+        "bg": "Изпускателен клапан",
+        "en": "Exhaust valve"
+      },
+      {
+        "bg": "Всмукателен клапан",
+        "en": "Intake valve"
+      },
+      {
+        "bg": "Ангренажен верига комплект",
+        "en": "Timing chain kit"
+      },
+      {
+        "bg": "Семеринг разпределителен вал",
+        "en": "Camshaft seal"
+      },
+      {
+        "bg": "Маслена помпа",
+        "en": "Oil pump"
+      },
+      {
+        "bg": "Щека масло",
+        "en": "Dipstick"
+      },
+      {
+        "bg": "Тампон двигател",
+        "en": "Engine mount"
+      },
+      {
+        "bg": "Картер",
+        "en": "Oil pan"
+      },
+      {
+        "bg": "Клапан картерни газове",
+        "en": "PCV valve"
+      },
+      {
+        "bg": "Маслен сепаратор",
+        "en": "Oil separator"
+      },
+      {
+        "bg": "AGR-модул",
+        "en": "EGR module"
+      },
+      {
+        "bg": "Демпферна шайба колянов вал",
+        "en": "Crankshaft damper washer"
+      }
+    ]
+  },
+  {
+    "bg": "Основен ремонт",
+    "en": "",
+    "children": [
+      {
+        "bg": "Бутала",
+        "en": "Pistons"
+      },
+      {
+        "bg": "Сегменти",
+        "en": "Piston rings"
+      },
+      {
+        "bg": "Колянов вал",
+        "en": "Crankshaft"
+      },
+      {
+        "bg": "Биела",
+        "en": "Connecting rods"
+      },
+      {
+        "bg": "Биелни лагери",
+        "en": "Connecting rod bearings"
+      },
+      {
+        "bg": "Други части основен ремонт",
+        "en": "Other overhaul parts"
+      },
+      {
+        "bg": "Основни лагери",
+        "en": "Main bearings"
+      },
+      {
+        "bg": "Аксиални шайби",
+        "en": "Thrust washers"
+      },
+      {
+        "bg": "Цилиндрова риза",
+        "en": "Cylinder liner"
+      },
+      {
+        "bg": "Тапа за блок",
+        "en": "Block plug"
+      }
+    ]
+  },
+  {
+    "bg": "Гарнитури и уплътнения",
+    "en": "",
+    "children": [
+      {
+        "bg": "Всмукващ маркуч въздушен филтър",
+        "en": "Air intake hose"
+      },
+      {
+        "bg": "Гарнитура турбо",
+        "en": "Turbo gasket"
+      },
+      {
+        "bg": "Други гарнитури и уплътнения",
+        "en": "Other gaskets and seals"
+      },
+      {
+        "bg": "Комплект гарнитури турбина",
+        "en": "Turbo gasket kit"
+      },
+      {
+        "bg": "Болтове за глава",
+        "en": "Head bolts"
+      },
+      {
+        "bg": "Гарнитура изпускателен колектор",
+        "en": "Exhaust manifold gasket"
+      },
+      {
+        "bg": "Комплект гарнитури ГНП",
+        "en": "High-pressure pump gasket kit"
+      },
+      {
+        "bg": "Гарнитура всмукателен колектор",
+        "en": "Intake manifold gasket"
+      },
+      {
+        "bg": "Комплект гарнитури за дюза",
+        "en": "Injector gasket kit"
+      },
+      {
+        "bg": "Гарнитура капак клапани",
+        "en": "Valve cover gasket"
+      },
+      {
+        "bg": "Гарнитура глава",
+        "en": "Head gasket"
+      },
+      {
+        "bg": "Уплътнение резервоар за гориво",
+        "en": "Fuel tank seal"
+      },
+      {
+        "bg": "Гарнитура фланец",
+        "en": "Flange gasket"
+      },
+      {
+        "bg": "Гарнитура водна помпа",
+        "en": "Water pump gasket"
+      },
+      {
+        "bg": "Гумички за клапани",
+        "en": "Valve stem seals"
+      },
+      {
+        "bg": "Гарнитура термостат",
+        "en": "Thermostat gasket"
+      },
+      {
+        "bg": "Гарнитура маслена помпа",
+        "en": "Oil pump gasket"
+      },
+      {
+        "bg": "Гарнитура картер",
+        "en": "Oil pan gasket"
+      },
+      {
+        "bg": "Гарнитура маслен радиатор",
+        "en": "Oil cooler gasket"
+      },
+      {
+        "bg": "Пълен комплект гарнитури",
+        "en": "Full gasket set"
+      }
+    ]
+  },
+  {
+    "bg": "Охладителна система",
+    "en": "",
+    "children": [
+      {
+        "bg": "Термостат",
+        "en": "Thermostat"
+      },
+      {
+        "bg": "Вентилатор охлаждане",
+        "en": "Cooling fan"
+      },
+      {
+        "bg": "Водна помпа",
+        "en": "Water pump"
+      },
+      {
+        "bg": "Допълнителна водна помпа",
+        "en": "Auxiliary water pump"
+      },
+      {
+        "bg": "Винт обезвъздушаване радиатор",
+        "en": "Radiator bleed screw"
+      },
+      {
+        "bg": "Вискосъединител",
+        "en": "Viscous clutch"
+      },
+      {
+        "bg": "О-пръстен радиатор",
+        "en": "Radiator O-ring"
+      },
+      {
+        "bg": "Разширителен съд охлаждане",
+        "en": "Coolant expansion tank"
+      },
+      {
+        "bg": "Дифузьор",
+        "en": "Diffuser"
+      },
+      {
+        "bg": "Капачка разширителен съд",
+        "en": "Expansion tank cap"
+      },
+      {
+        "bg": "Фланец охладителна система",
+        "en": "Cooling system flange"
+      },
+      {
+        "bg": "Радиатор",
+        "en": "Radiator"
+      },
+      {
+        "bg": "Перка охлаждане",
+        "en": "Cooling fan blade"
+      },
+      {
+        "bg": "Тапа за фланец",
+        "en": "Flange plug"
+      },
+      {
+        "bg": "Резистор перка охлаждане",
+        "en": "Cooling fan resistor"
+      },
+      {
+        "bg": "Маслен охладител",
+        "en": "Oil cooler"
+      }
+    ]
+  },
+  {
+    "bg": "Запалителна система",
+    "en": "",
+    "children": [
+      {
+        "bg": "Подгревна свещ",
+        "en": "Glow plug"
+      },
+      {
+        "bg": "Реле за подгревни свещи",
+        "en": "Glow plug relay"
+      },
+      {
+        "bg": "Запалителна свещ",
+        "en": "Spark plug"
+      },
+      {
+        "bg": "Бобина",
+        "en": "Ignition coil"
+      },
+      {
+        "bg": "Дистрибуторна капачка",
+        "en": "Distributor cap"
+      },
+      {
+        "bg": "Палец дистрибутор на запалване",
+        "en": "Distributor rotor"
+      },
+      {
+        "bg": "Запалителни кабели",
+        "en": "Spark plug wires"
+      },
+      {
+        "bg": "Части запалителна система",
+        "en": "Other ignition parts"
+      },
+      {
+        "bg": "Комутатор",
+        "en": "Ignition switch"
+      },
+      {
+        "bg": "Монтажна паста подгревна свещ",
+        "en": "Glow plug installation paste"
+      },
+      {
+        "bg": "Кабел подгревни свещи",
+        "en": "Glow plug cable"
+      },
+      {
+        "bg": "Щекер запалителна свещ",
+        "en": "Spark plug connector"
+      },
+      {
+        "bg": "Щекер-запалителен кабел",
+        "en": "Ignition cable connector"
+      },
+      {
+        "bg": "Делко",
+        "en": "Ignition distributor"
+      },
+      {
+        "bg": "Щекер на бобината",
+        "en": "Ignition coil connector"
+      },
+      {
+        "bg": "Кондензатор запалителна система",
+        "en": "Ignition condenser"
+      }
+    ]
+  },
+  {
+    "bg": "Горивна система",
+    "en": "",
+    "children": [
+      {
+        "bg": "Управляващ модул двигател",
+        "en": "Engine control module"
+      },
+      {
+        "bg": "Потенциометър на дроселова клапа",
+        "en": "Throttle position sensor"
+      },
+      {
+        "bg": "Ламбда сонда",
+        "en": "Lambda sensor"
+      },
+      {
+        "bg": "Акумулатор налягане на горивото",
+        "en": "Fuel accumulator"
+      },
+      {
+        "bg": "Дюзодържач",
+        "en": "Injector holder"
+      },
+      {
+        "bg": "Горивна помпа",
+        "en": "Fuel pump"
+      },
+      {
+        "bg": "Резервоар за гориво",
+        "en": "Fuel tank"
+      },
+      {
+        "bg": "Уплътнение горивна помпа",
+        "en": "Fuel pump seal"
+      },
+      {
+        "bg": "Гарнитура дроселова клапа",
+        "en": "Throttle body gasket"
+      },
+      {
+        "bg": "Дюза",
+        "en": "Injector"
+      },
+      {
+        "bg": "Разпръсквач дюза",
+        "en": "Injector nozzle"
+      },
+      {
+        "bg": "Маркучи и щуцери обратна нафта",
+        "en": "Fuel return hoses and fittings"
+      },
+      {
+        "bg": "Регулатор налягане гориво за дизел",
+        "en": "Diesel fuel pressure regulator"
+      },
+      {
+        "bg": "Регулатор налягане на горивото за бензин",
+        "en": "Gasoline fuel pressure regulator"
+      },
+      {
+        "bg": "Инжекционен клапан",
+        "en": "Injection valve"
+      },
+      {
+        "bg": "Дроселова клапа",
+        "en": "Throttle body"
+      },
+      {
+        "bg": "Горивна помпа ГНП",
+        "en": "High-pressure fuel pump"
+      },
+      {
+        "bg": "Помпа-дюза",
+        "en": "Unit injector"
+      },
+      {
+        "bg": "Дихтунг под дюза",
+        "en": "Injector seal"
+      },
+      {
+        "bg": "Капачка резервоар",
+        "en": "Fuel cap"
+      },
+      {
+        "bg": "Уплътнение горивопровод",
+        "en": "Fuel line seal"
+      },
+      {
+        "bg": "Горивен нагревател",
+        "en": "Fuel heater"
+      },
+      {
+        "bg": "Гърловина на резервоар",
+        "en": "Fuel tank neck"
+      },
+      {
+        "bg": "Държач горивен филтър",
+        "en": "Fuel filter holder"
+      },
+      {
+        "bg": "Ръчна подкачваща помпа",
+        "en": "Hand primer pump"
+      }
+    ]
+  },
+  {
+    "bg": "Датчици, сензори и релета",
+    "en": "",
+    "children": [
+      {
+        "bg": "Датчик за налягане в изпускателна с-ма",
+        "en": "Exhaust pressure sensor"
+      },
+      {
+        "bg": "Датчик разпределителен вал",
+        "en": "Camshaft position sensor"
+      },
+      {
+        "bg": "Датчик темперетура на горивото",
+        "en": "Fuel temperature sensor"
+      },
+      {
+        "bg": "Датчик налягане на горивото",
+        "en": "Fuel pressure sensor"
+      },
+      {
+        "bg": "MAP сензор",
+        "en": "MAP sensor"
+      },
+      {
+        "bg": "Датчик на хол",
+        "en": "Hall sensor"
+      },
+      {
+        "bg": "Други датчици",
+        "en": "Other sensors"
+      },
+      {
+        "bg": "Реле запалителна уредба",
+        "en": "Ignition relay"
+      },
+      {
+        "bg": "Датчик колянов вал",
+        "en": "Crankshaft position sensor"
+      },
+      {
+        "bg": "Дебитомер",
+        "en": "Air flow meter"
+      },
+      {
+        "bg": "Реле горивна помпа",
+        "en": "Fuel pump relay"
+      },
+      {
+        "bg": "Датчик детонация",
+        "en": "Knock sensor"
+      },
+      {
+        "bg": "Датчик педала на газта",
+        "en": "Accelerator pedal sensor"
+      },
+      {
+        "bg": "Датчик налягане изпускателен колектор",
+        "en": "Exhaust manifold pressure sensor"
+      },
+      {
+        "bg": "Датчик твърди частици",
+        "en": "Particulate matter sensor"
+      },
+      {
+        "bg": "Датчик температура на изгорелите газове",
+        "en": "Exhaust gas temperature sensor"
+      },
+      {
+        "bg": "Датчик температура на горивото",
+        "en": "Fuel temperature sensor"
+      },
+      {
+        "bg": "Датчик температура на входящия въздух",
+        "en": "Intake air temperature sensor"
+      },
+      {
+        "bg": "Датчик дроселова клапа",
+        "en": "Throttle position sensor"
+      },
+      {
+        "bg": "Датчик налягане на турбото (MAP сензор)",
+        "en": "Turbo pressure sensor (MAP sensor)"
+      },
+      {
+        "bg": "Сензор 4 х 4",
+        "en": "4x4 sensor"
+      },
+      {
+        "bg": "Датчик налягане всмукателен колектор",
+        "en": "Intake manifold pressure sensor"
+      },
+      {
+        "bg": "Датчик диференциално налягане",
+        "en": "Differential pressure sensor"
+      },
+      {
+        "bg": "NOx-сензор катализатор",
+        "en": "NOx sensor"
+      },
+      {
+        "bg": "Управляващи модули",
+        "en": "Control modules"
+      },
+      {
+        "bg": "Датчик горивен филтър",
+        "en": "Fuel filter sensor"
+      },
+      {
+        "bg": "Датчик акумулатор",
+        "en": "Battery sensor"
+      },
+      {
+        "bg": "Датчик перка охлаждане",
+        "en": "Cooling fan sensor"
+      },
+      {
+        "bg": "Датчик ниво антифриз",
+        "en": "Coolant level sensor"
+      },
+      {
+        "bg": "Датчик съединител",
+        "en": "Clutch sensor"
+      },
+      {
+        "bg": "Реле вентилатор на радиатора",
+        "en": "Radiator fan relay"
+      },
+      {
+        "bg": "Реле за чистачките",
+        "en": "Wiper relay"
+      },
+      {
+        "bg": "Датчик ниво течност на чистачките",
+        "en": "Washer fluid level sensor"
+      },
+      {
+        "bg": "Реле стартер",
+        "en": "Starter relay"
+      },
+      {
+        "bg": "Реле имобилайзер",
+        "en": "Immobilizer relay"
+      },
+      {
+        "bg": "Датчик регулиране на фаровете",
+        "en": "Headlight leveling sensor"
+      },
+      {
+        "bg": "Датчик ABS",
+        "en": "ABS sensor"
+      },
+      {
+        "bg": "Датчик нивомер гориво",
+        "en": "Fuel level sensor"
+      },
+      {
+        "bg": "Датчик парктроник",
+        "en": "Parking sensor"
+      },
+      {
+        "bg": "Датчик ниво масло",
+        "en": "Oil level sensor"
+      },
+      {
+        "bg": "Датчик за налягане на маслото",
+        "en": "Oil pressure sensor"
+      },
+      {
+        "bg": "Датчик за ъгъла на завиване",
+        "en": "Steering angle sensor"
+      },
+      {
+        "bg": "Датчик темперетура на маслото",
+        "en": "Oil temperature sensor"
+      },
+      {
+        "bg": "Датчик за дъжд",
+        "en": "Rain sensor"
+      },
+      {
+        "bg": "Датчик задна скорост",
+        "en": "Rear speed sensor"
+      },
+      {
+        "bg": "Датчик заден капак",
+        "en": "Tailgate sensor"
+      },
+      {
+        "bg": "Датчик против заслепяване",
+        "en": "Anti-glare sensor"
+      },
+      {
+        "bg": "Датчик за врата",
+        "en": "Door sensor"
+      },
+      {
+        "bg": "Датчик движение аларма",
+        "en": "Alarm motion sensor"
+      },
+      {
+        "bg": "Датчик налягане в гумите",
+        "en": "Tire pressure sensor"
+      },
+      {
+        "bg": "Реле мигачи",
+        "en": "Turn signal relay"
+      },
+      {
+        "bg": "Температурен датчик",
+        "en": "Temperature sensor"
+      },
+      {
+        "bg": "Датчик обороти",
+        "en": "RPM sensor"
+      },
+      {
+        "bg": "Реле климатична система",
+        "en": "Climate control relay"
+      },
+      {
+        "bg": "Датчик климатик",
+        "en": "Climate control sensor"
+      },
+      {
+        "bg": "Датчик външна температура",
+        "en": "Outside temperature sensor"
+      },
+      {
+        "bg": "Датчик позиция на лоста",
+        "en": "Gear position sensor"
+      },
+      {
+        "bg": "Датчик превключване скорости",
+        "en": "Gear shift sensor"
+      },
+      {
+        "bg": "Датчик ESP",
+        "en": "ESP sensor"
+      },
+      {
+        "bg": "Датчик предно стъкло",
+        "en": "Windshield sensor"
+      },
+      {
+        "bg": "Датчик километраж",
+        "en": "Mileage sensor"
+      }
+    ]
+  },
+  {
+    "bg": "Стартер и алтернатор",
+    "en": "",
+    "children": [
+      {
+        "bg": "Алтернатор",
+        "en": "Alternator"
+      },
+      {
+        "bg": "Реле регулатор",
+        "en": "Voltage regulator relay"
+      },
+      {
+        "bg": "Шайба алтернатор",
+        "en": "Alternator washer"
+      },
+      {
+        "bg": "Четки алтернатор",
+        "en": "Alternator brushes"
+      },
+      {
+        "bg": "Лагер алтернатор",
+        "en": "Alternator bearing"
+      },
+      {
+        "bg": "Диоден блок алтернатор",
+        "en": "Alternator diode pack"
+      },
+      {
+        "bg": "Статор алтернатор",
+        "en": "Alternator stator"
+      },
+      {
+        "bg": "Ротор алтернатор",
+        "en": "Alternator rotor"
+      },
+      {
+        "bg": "Окачване алтернатор",
+        "en": "Alternator mount"
+      },
+      {
+        "bg": "Свързващ кабел акумулатор",
+        "en": "Battery cable"
+      },
+      {
+        "bg": "Части алтернатор",
+        "en": "Other alternator parts"
+      },
+      {
+        "bg": "Клеморед",
+        "en": "Terminal strip"
+      },
+      {
+        "bg": "Стартер",
+        "en": "Starter"
+      },
+      {
+        "bg": "Четкодържач стартер",
+        "en": "Starter brush holder"
+      },
+      {
+        "bg": "Шалтер стартер",
+        "en": "Starter solenoid"
+      },
+      {
+        "bg": "Бендикс",
+        "en": "Starter bendix"
+      },
+      {
+        "bg": "Ротор стартер",
+        "en": "Starter rotor"
+      },
+      {
+        "bg": "Лагер стартер",
+        "en": "Starter bearing"
+      },
+      {
+        "bg": "Части за стартер",
+        "en": "Other starter parts"
+      },
+      {
+        "bg": "Ремонтен комплект стартер",
+        "en": "Starter repair kit"
+      },
+      {
+        "bg": "Старт-стоп бутон",
+        "en": "Start-stop button"
+      }
+    ]
+  },
+  {
+    "bg": "Отопление и вентилация",
+    "en": "",
+    "children": [
+      {
+        "bg": "Радиаторче за парно",
+        "en": "Heater core"
+      },
+      {
+        "bg": "Резистор (реостат) за парно",
+        "en": "Heater resistor"
+      },
+      {
+        "bg": "Вентилатор за парно",
+        "en": "Heater fan"
+      },
+      {
+        "bg": "Моторче за парно",
+        "en": "Heater motor"
+      },
+      {
+        "bg": "Клапан парно",
+        "en": "Heater valve"
+      },
+      {
+        "bg": "Ключ вентилатор за парно",
+        "en": "Heater fan switch"
+      },
+      {
+        "bg": "Жило за клапите на парното",
+        "en": "Heater control cable"
+      },
+      {
+        "bg": "Перка вентилатор вътрешно пространство",
+        "en": "Interior fan blade"
+      },
+      {
+        "bg": "Подгряващи Свещи Отопление",
+        "en": "Heating glow plugs"
+      },
+      {
+        "bg": "Допълнителна помпа парно",
+        "en": "Auxiliary heater pump"
+      },
+      {
+        "bg": "Регулатор обдухване интериор",
+        "en": "Interior vent control"
+      },
+      {
+        "bg": "Реле вентилатор купе",
+        "en": "Interior fan relay"
+      },
+      {
+        "bg": "Управляващ блок вентилация",
+        "en": "Ventilation control unit"
+      }
+    ]
+  },
+  {
+    "bg": "Климатик",
+    "en": "",
+    "children": [
+      {
+        "bg": "Компресор климатик",
+        "en": "AC compressor"
+      },
+      {
+        "bg": "Радиатор за климатик",
+        "en": "AC condenser"
+      },
+      {
+        "bg": "Магнитен съединител компресор",
+        "en": "AC compressor clutch"
+      },
+      {
+        "bg": "Бобина за съединител на компресора",
+        "en": "AC compressor clutch coil"
+      },
+      {
+        "bg": "Лагер на компресора на климатика",
+        "en": "AC compressor bearing"
+      },
+      {
+        "bg": "Шайба за компресора на климатика",
+        "en": "AC compressor washer"
+      },
+      {
+        "bg": "Дехидратор",
+        "en": "AC dryer"
+      },
+      {
+        "bg": "Изпарител",
+        "en": "AC evaporator"
+      },
+      {
+        "bg": "Разширителен Клапан",
+        "en": "AC expansion valve"
+      },
+      {
+        "bg": "Части климатична уредба",
+        "en": "Other AC parts"
+      },
+      {
+        "bg": "О-пръстени компресор климатик",
+        "en": "AC compressor O-rings"
+      },
+      {
+        "bg": "Регулиращ Клапан",
+        "en": "AC control valve"
+      },
+      {
+        "bg": "Вентилатор на радиатора за климатика",
+        "en": "AC condenser fan"
+      },
+      {
+        "bg": "Термошалтер вентилатор за климатизатора",
+        "en": "AC fan thermoswitch"
+      },
+      {
+        "bg": "Датчик налягане на фреона",
+        "en": "AC pressure sensor"
+      },
+      {
+        "bg": "Управляващ блок климатизация",
+        "en": "AC control unit"
+      }
+    ]
+  },
+  {
+    "bg": "Почистване на стъклата",
+    "en": "",
+    "children": [
+      {
+        "bg": "Пръскалка на фаровете",
+        "en": "Headlight washer"
+      },
+      {
+        "bg": "Чистачка за фаровете",
+        "en": "Headlight wiper"
+      },
+      {
+        "bg": "Гумичка на перото на чистачка",
+        "en": "Wiper blade rubber"
+      },
+      {
+        "bg": "Дюза пръскалка на стъклата",
+        "en": "Washer nozzle"
+      },
+      {
+        "bg": "Казанче течност за чистачки",
+        "en": "Washer fluid reservoir"
+      },
+      {
+        "bg": "Чистачки",
+        "en": "Wipers"
+      },
+      {
+        "bg": "Помпичка течност за чистачките",
+        "en": "Washer pump"
+      },
+      {
+        "bg": "Лост чистачки",
+        "en": "Wiper arm"
+      },
+      {
+        "bg": "Други части стъклопочистване",
+        "en": "Other window cleaning parts"
+      },
+      {
+        "bg": "Моторче за чистачките",
+        "en": "Wiper motor"
+      },
+      {
+        "bg": "Капачка рамо на чистачка",
+        "en": "Wiper arm cap"
+      },
+      {
+        "bg": "Рамена за чистачки",
+        "en": "Wiper linkage"
+      },
+      {
+        "bg": "Лостов механизъм на чистачките",
+        "en": "Wiper linkage"
+      }
+    ]
+  },
+  {
+    "bg": "Електрическа система",
+    "en": "",
+    "children": [
+      {
+        "bg": "Централно заключване",
+        "en": "Central locking"
+      },
+      {
+        "bg": "Ремонтни кабели",
+        "en": "Repair cables"
+      },
+      {
+        "bg": "Управляващ блок",
+        "en": "Control unit"
+      },
+      {
+        "bg": "Релета",
+        "en": "Relays"
+      },
+      {
+        "bg": "Акумулатор",
+        "en": "Battery"
+      },
+      {
+        "bg": "Управляващ блок ABS",
+        "en": "ABS control unit"
+      },
+      {
+        "bg": "Антена",
+        "en": "Antenna"
+      }
+    ]
+  },
+  {
+    "bg": "Светлини",
+    "en": "",
+    "children": [
+      {
+        "bg": "Други светлини",
+        "en": "Other lights"
+      },
+      {
+        "bg": "Други крушки",
+        "en": "Other bulbs"
+      },
+      {
+        "bg": "Дневни светлини",
+        "en": "Daytime running lights"
+      },
+      {
+        "bg": "Габаритни светлини",
+        "en": "Side marker lights"
+      },
+      {
+        "bg": "Крушка за фар",
+        "en": "Headlight bulb"
+      },
+      {
+        "bg": "Крушка за габарита",
+        "en": "Side marker bulb"
+      },
+      {
+        "bg": "Крушка за регистрационния номер",
+        "en": "License plate bulb"
+      },
+      {
+        "bg": "Крушка за табло",
+        "en": "Dashboard bulb"
+      },
+      {
+        "bg": "Плафони регистрационен номер",
+        "en": "License plate light"
+      },
+      {
+        "bg": "Фасунги",
+        "en": "Light housing"
+      },
+      {
+        "bg": "Фар",
+        "en": "Headlight"
+      },
+      {
+        "bg": "Халоген-фар за мъгла",
+        "en": "Halogen fog light"
+      },
+      {
+        "bg": "Крушка за халоген",
+        "en": "Halogen bulb"
+      },
+      {
+        "bg": "Крушка мигач",
+        "en": "Turn signal bulb"
+      },
+      {
+        "bg": "Плафон на вратата",
+        "en": "Door light"
+      },
+      {
+        "bg": "Светлини за движение назад",
+        "en": "Reverse lights"
+      },
+      {
+        "bg": "Задни светлини за мъгла",
+        "en": "Rear fog lights"
+      },
+      {
+        "bg": "Баласт",
+        "en": "Ballast"
+      },
+      {
+        "bg": "Мигач",
+        "en": "Turn signal"
+      },
+      {
+        "bg": "Крушка за стоп",
+        "en": "Brake light bulb"
+      },
+      {
+        "bg": "Крушка за мигач",
+        "en": "Turn signal bulb"
+      },
+      {
+        "bg": "Стоп",
+        "en": "Brake light"
+      },
+      {
+        "bg": "Допълнителен трети стоп",
+        "en": "Third brake light"
+      },
+      {
+        "bg": "Мигач в огледалото",
+        "en": "Mirror turn signal"
+      }
+    ]
+  },
+  {
+    "bg": "Изпускателна система",
+    "en": "",
+    "children": [
+      {
+        "bg": "Средно гърне",
+        "en": "Middle muffler"
+      },
+      {
+        "bg": "Предно гърне",
+        "en": "Front muffler"
+      },
+      {
+        "bg": "Задно гърне",
+        "en": "Rear muffler"
+      },
+      {
+        "bg": "Скоба изпускателна система",
+        "en": "Exhaust clamp"
+      },
+      {
+        "bg": "Катализатор",
+        "en": "Catalytic converter"
+      },
+      {
+        "bg": "Ремонтен комплект изпускател",
+        "en": "Exhaust repair kit"
+      },
+      {
+        "bg": "Мека връзка ауспух",
+        "en": "Exhaust flex pipe"
+      },
+      {
+        "bg": "Тръба изпускателна система",
+        "en": "Exhaust pipe"
+      },
+      {
+        "bg": "Спортно гърне",
+        "en": "Sports muffler"
+      },
+      {
+        "bg": "Егр клапан",
+        "en": "EGR valve"
+      },
+      {
+        "bg": "Изпускателна тръба",
+        "en": "Exhaust pipe"
+      },
+      {
+        "bg": "Изпускателен колектор",
+        "en": "Exhaust manifold"
+      },
+      {
+        "bg": "Ударен тампон гърне",
+        "en": "Muffler hanger"
+      },
+      {
+        "bg": "DPF Филтър за твърди частици",
+        "en": "DPF filter"
+      },
+      {
+        "bg": "Други части изпускателна система",
+        "en": "Other exhaust parts"
+      }
+    ]
+  },
+  {
+    "bg": "Трансмисия",
+    "en": "",
+    "children": [
+      {
+        "bg": "Вилка съединител",
+        "en": "Clutch fork"
+      },
+      {
+        "bg": "Части автоматична скоростна кутия",
+        "en": "Automatic transmission parts"
+      },
+      {
+        "bg": "Картер автоматична кутия",
+        "en": "Automatic transmission pan"
+      },
+      {
+        "bg": "Гарнитура автоматик",
+        "en": "Automatic transmission gasket"
+      },
+      {
+        "bg": "Превключващ клапан автоматик",
+        "en": "Automatic transmission shift valve"
+      },
+      {
+        "bg": "Мехатроник",
+        "en": "Mechatronic unit"
+      },
+      {
+        "bg": "Хидротрансформатор",
+        "en": "Torque converter"
+      },
+      {
+        "bg": "Щека масло автоматик",
+        "en": "Automatic transmission dipstick"
+      },
+      {
+        "bg": "Маслен радиатор автоматик",
+        "en": "Automatic transmission oil cooler"
+      },
+      {
+        "bg": "Части ръчна скоростна кутия",
+        "en": "Manual transmission parts"
+      },
+      {
+        "bg": "Синхронизатор",
+        "en": "Synchronizer"
+      },
+      {
+        "bg": "Ремонтен комплект скорости",
+        "en": "Gear repair kit"
+      },
+      {
+        "bg": "Жило скорости",
+        "en": "Gear shift cable"
+      },
+      {
+        "bg": "Тампон скоростна кутия",
+        "en": "Transmission mount"
+      },
+      {
+        "bg": "Скоростомер",
+        "en": "Speedometer"
+      },
+      {
+        "bg": "Маншон скоростен лост",
+        "en": "Gear shift boot"
+      },
+      {
+        "bg": "Лагер скоростна кутия",
+        "en": "Transmission bearing"
+      },
+      {
+        "bg": "Скоростен лост",
+        "en": "Gear shift lever"
+      },
+      {
+        "bg": "Муфа скоростна кутия",
+        "en": "Transmission coupling"
+      },
+      {
+        "bg": "Семеринг скоростна кутия",
+        "en": "Transmission seal"
+      },
+      {
+        "bg": "Водач скоростен лост",
+        "en": "Gear shift guide"
+      },
+      {
+        "bg": "Превключваща щанга",
+        "en": "Shift rod"
+      }
+    ]
+  },
+  {
+    "bg": "Окачване",
+    "en": "",
+    "children": [
+      {
+        "bg": "Амортисьори",
+        "en": "Shock absorbers"
+      },
+      {
+        "bg": "Пружини",
+        "en": "Springs"
+      },
+      {
+        "bg": "Тампон макферсън",
+        "en": "Strut mount"
+      },
+      {
+        "bg": "Лагер макферсон",
+        "en": "Strut bearing"
+      },
+      {
+        "bg": "Пружинна опора",
+        "en": "Spring seat"
+      },
+      {
+        "bg": "Прахозащитен к-т (Прахоуловители)",
+        "en": "Dust cover kit"
+      },
+      {
+        "bg": "Ударен тампон на пружината",
+        "en": "Spring bumper"
+      },
+      {
+        "bg": "Скоба за пружина",
+        "en": "Spring clamp"
+      },
+      {
+        "bg": "Хидравлична помпа окачване (Компресор въздушно окачване)",
+        "en": "Suspension compressor"
+      },
+      {
+        "bg": "Втулки на ресьора",
+        "en": "Leaf spring bushings"
+      },
+      {
+        "bg": "Сфера",
+        "en": "Suspension sphere"
+      },
+      {
+        "bg": "Реле регулиране на нивото",
+        "en": "Leveling relay"
+      },
+      {
+        "bg": "Въздушна възглавница",
+        "en": "Air spring"
+      },
+      {
+        "bg": "Ресьори",
+        "en": "Leaf springs"
+      },
+      {
+        "bg": "Втулка амортисьор",
+        "en": "Shock absorber bushing"
+      },
+      {
+        "bg": "Други части окачване",
+        "en": "Other suspension parts"
+      }
+    ]
+  },
+  {
+    "bg": "Бутони и превключватели",
+    "en": "",
+    "children": [
+      {
+        "bg": "Бутон airbag",
+        "en": "Airbag button"
+      },
+      {
+        "bg": "Други превключватели",
+        "en": "Other switches"
+      },
+      {
+        "bg": "Бутон ел огледала",
+        "en": "Power mirror switch"
+      },
+      {
+        "bg": "Бутон подгряване на седлаките",
+        "en": "Seat heater switch"
+      },
+      {
+        "bg": "Бутон за халогените",
+        "en": "Halogen light switch"
+      },
+      {
+        "bg": "Ключ светлини",
+        "en": "Light switch"
+      },
+      {
+        "bg": "Зумер",
+        "en": "Buzzer"
+      },
+      {
+        "bg": "Стоп машинка",
+        "en": "Stop button"
+      },
+      {
+        "bg": "Бутон подгряване на предното стъкло",
+        "en": "Front defroster switch"
+      },
+      {
+        "bg": "Бутон подгряване на задното стъкло",
+        "en": "Rear defroster switch"
+      },
+      {
+        "bg": "Паркотроник",
+        "en": "Parking sensor switch"
+      },
+      {
+        "bg": "Контактен ключ на вратата",
+        "en": "Door contact switch"
+      },
+      {
+        "bg": "Бутон регулиране на седалка",
+        "en": "Seat adjustment button"
+      },
+      {
+        "bg": "Бутон ел стъклата",
+        "en": "Power window switch"
+      },
+      {
+        "bg": "Лентов кабел airbag",
+        "en": "Airbag ribbon cable"
+      },
+      {
+        "bg": "Клаксон",
+        "en": "Horn"
+      },
+      {
+        "bg": "Бутон клаксон",
+        "en": "Horn button"
+      },
+      {
+        "bg": "Лост за мигачи",
+        "en": "Turn signal lever"
+      },
+      {
+        "bg": "Ключ аварийни светлини",
+        "en": "Hazard light switch"
+      },
+      {
+        "bg": "Лентов кабел на волана",
+        "en": "Steering wheel ribbon cable"
+      },
+      {
+        "bg": "Бутон ESP",
+        "en": "ESP button"
+      },
+      {
+        "bg": "Лост за фарове",
+        "en": "Headlight lever"
+      }
+    ]
+  },
+  {
+    "bg": "Маркучи и тръби",
+    "en": "",
+    "children": [
+      {
+        "bg": "Маркуч радиатор",
+        "en": "Radiator hose"
+      },
+      {
+        "bg": "Маркуч радиаторче парно",
+        "en": "Heater hose"
+      },
+      {
+        "bg": "Тръба охладителна система",
+        "en": "Coolant pipe"
+      },
+      {
+        "bg": "Въздуховод турбо",
+        "en": "Turbo air duct"
+      },
+      {
+        "bg": "Горивен маркуч",
+        "en": "Fuel hose"
+      },
+      {
+        "bg": "Маркуч въздушен филтър",
+        "en": "Air filter hose"
+      },
+      {
+        "bg": "Маркуч обратно гориво",
+        "en": "Fuel return hose"
+      },
+      {
+        "bg": "Маркуч картерни газове",
+        "en": "Crankcase ventilation hose"
+      },
+      {
+        "bg": "Гарнитура тръба охлаждане",
+        "en": "Coolant pipe gasket"
+      },
+      {
+        "bg": "Маркуч хидравлика на съединителя",
+        "en": "Clutch hydraulic hose"
+      },
+      {
+        "bg": "Маркуч хидравлика на волана",
+        "en": "Power steering hose"
+      },
+      {
+        "bg": "Хидравличен маркуч",
+        "en": "Hydraulic hose"
+      },
+      {
+        "bg": "Маркуч за климатик",
+        "en": "AC hose"
+      }
+    ]
+  },
+  {
+    "bg": "Каросерия",
+    "en": "",
+    "children": [
+      {
+        "bg": "Ключалка",
+        "en": "Door lock"
+      },
+      {
+        "bg": "Външно огледало",
+        "en": "Side mirror"
+      },
+      {
+        "bg": "Рамка радиатор",
+        "en": "Radiator frame"
+      },
+      {
+        "bg": "Водач на бронята",
+        "en": "Bumper guide"
+      },
+      {
+        "bg": "Стъкло за външно огледало",
+        "en": "Mirror glass"
+      },
+      {
+        "bg": "Лайсни",
+        "en": "Trim"
+      },
+      {
+        "bg": "Броня",
+        "en": "Bumper"
+      },
+      {
+        "bg": "Праг",
+        "en": "Sill"
+      },
+      {
+        "bg": "Решетка пред радиатора",
+        "en": "Grille"
+      },
+      {
+        "bg": "Жило за капака на двигателя",
+        "en": "Hood release cable"
+      },
+      {
+        "bg": "Газов амортисьор багажник",
+        "en": "Gas strut"
+      },
+      {
+        "bg": "Уплътнения по купето",
+        "en": "Weatherstripping"
+      },
+      {
+        "bg": "Уплътнение предно стъкло",
+        "en": "Windshield seal"
+      },
+      {
+        "bg": "Буфер броня",
+        "en": "Bumper buffer"
+      },
+      {
+        "bg": "Капак върху двигателя",
+        "en": "Bonnet"
+      },
+      {
+        "bg": "Пета врата",
+        "en": "Tailgate"
+      },
+      {
+        "bg": "Държач на фара",
+        "en": "Headlight holder"
+      },
+      {
+        "bg": "Емблема",
+        "en": "Emblem"
+      },
+      {
+        "bg": "Стъкла",
+        "en": "Glass"
+      },
+      {
+        "bg": "Калник",
+        "en": "Fender"
+      },
+      {
+        "bg": "Кора под двигателя",
+        "en": "Engine undercover"
+      },
+      {
+        "bg": "Подкалник",
+        "en": "Splash guard"
+      },
+      {
+        "bg": "Преден капак",
+        "en": "Bonnet"
+      },
+      {
+        "bg": "Калобран",
+        "en": "Mud flap"
+      },
+      {
+        "bg": "Предна маска",
+        "en": "Front fascia"
+      },
+      {
+        "bg": "Решетка в бронята",
+        "en": "Bumper grille"
+      },
+      {
+        "bg": "Водеща шина плъзгаща врата",
+        "en": "Sliding door rail"
+      },
+      {
+        "bg": "Греда под радиатора",
+        "en": "Radiator support"
+      },
+      {
+        "bg": "Греда за броня",
+        "en": "Bumper beam"
+      },
+      {
+        "bg": "Степенка",
+        "en": "Running board"
+      },
+      {
+        "bg": "Панти",
+        "en": "Hinges"
+      },
+      {
+        "bg": "Брава за преден капак",
+        "en": "Hood latch"
+      },
+      {
+        "bg": "Спойлер",
+        "en": "Spoiler"
+      },
+      {
+        "bg": "Конзола решетка пред радиатор",
+        "en": "Grille bracket"
+      },
+      {
+        "bg": "Ударен тампон",
+        "en": "Bumper absorber"
+      },
+      {
+        "bg": "Предно стъкло",
+        "en": "Windshield"
+      },
+      {
+        "bg": "Крепежни елементи",
+        "en": "Fasteners"
+      }
+    ]
+  },
+  {
+    "bg": "Интериор",
+    "en": "",
+    "children": [
+      {
+        "bg": "Брава на вратата",
+        "en": "Door lock"
+      },
+      {
+        "bg": "Вътрешно огледало",
+        "en": "Rearview mirror"
+      },
+      {
+        "bg": "Брава на багажника",
+        "en": "Trunk lock"
+      },
+      {
+        "bg": "Жабка",
+        "en": "Door handle"
+      },
+      {
+        "bg": "Сенник",
+        "en": "Sun visor"
+      },
+      {
+        "bg": "Стъклоповдигач",
+        "en": "Window regulator"
+      },
+      {
+        "bg": "Дръжки",
+        "en": "Handles"
+      },
+      {
+        "bg": "Дръжка за врата",
+        "en": "Door handle"
+      }
+    ]
+  }
+]
