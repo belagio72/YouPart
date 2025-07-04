@@ -546,6 +546,7 @@ app.get('/api/resolve-id', async (req, res) => {
 
   try {
     const accessToken = await getEbayAccessToken();
+    console.log("🔑 [US] Access Token:", accessToken);
     const ebayRes = await axios.get(`https://api.ebay.com/buy/browse/v1/item/v1|${itemId}|0`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -587,6 +588,7 @@ app.get('/api/resolve-id', async (req, res) => {
 
   try {
     const accessToken = await getEbayAccessToken();
+    console.log("🔑 [GB] Access Token:", accessToken);
     const ebayRes = await axios.get(`https://api.ebay.com/buy/browse/v1/item/${numericId}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
