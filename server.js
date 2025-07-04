@@ -28,7 +28,7 @@ const { registerUser, loginUser } = require('./auth');
 app.use(express.json());
 app.post('/api/register', registerUser);
 app.post('/api/login', loginUser);
-const config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
+
 
 
 function loadSettings() {
@@ -367,7 +367,7 @@ app.post('/order', async (req, res) => {
 async function detectLanguage(text) {
   try {
     const response = await axios.post('https://translation.googleapis.com/language/translate/v2/detect', { q: text }, {
-      params: { key: config.googleApiKey },
+      params: { key: process.env.GOOGLE_TRANSLATE_KEY },
     });
     return response.data.data.detections[0][0].language;
   } catch (error) {
@@ -379,7 +379,7 @@ async function detectLanguage(text) {
 async function translateText(text, from, to) {
   try {
     const response = await axios.post('https://translation.googleapis.com/language/translate/v2', null, {
-      params: { q: text, source: from, target: to, key: config.googleApiKey },
+      params: { q: text, source: from, target: to, key: process.env.GOOGLE_TRANSLATE_KEY },
     });
     return response.data.data.translations[0].translatedText;
   } catch (error) {
@@ -411,7 +411,7 @@ app.get('/search', async (req, res) => {
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${config.ebayBase64}`,
+          Authorization: `Basic ${process.env.EBAY_BASE64}`
         },
       }
     );
@@ -443,20 +443,30 @@ const finalFilters = {
   ...(condition === 'new' ? { filter: (baseFilters.filter ? baseFilters.filter + ',' : '') + 'conditionIds:{1000}' } : {})
 };
 
-const ebayRes = await axios.get('https://api.ebay.com/buy/browse/v1/item_summary/search', {
-  headers: {
-    Authorization: `Bearer ${accessToken}`,
-    'X-EBAY-C-MARKETPLACE-ID': marketplaceId
-  },
-  params: {
-    q: translatedQuery,
-    limit: 20,
-    offset,
-    buying_options: 'FIXED_PRICE',
-    sort: 'bestMatch',
-    ...finalFilters
-  }
-});
+try {
+  const ebayRes = await axios.get('https://api.ebay.com/buy/browse/v1/item_summary/search', {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'X-EBAY-C-MARKETPLACE-ID': marketplaceId,
+      'User-Agent': 'YouPart/1.0'
+    },
+    params: {
+      q: translatedQuery,
+      limit: 20,
+      offset,
+      buying_options: 'FIXED_PRICE',
+      sort: 'bestMatch',
+      ...finalFilters
+    }
+  });
+
+  console.log("✅ eBay response data:", ebayRes.data);
+  res.json(ebayRes.data);
+} catch (err) {
+  console.error("❌ eBay API error:", err.response?.data || err.message);
+  res.status(500).json({ error: 'eBay API error', details: err.response?.data || err.message });
+}
+
 
     const items = ebayRes.data.itemSummaries || [];
 
@@ -519,7 +529,7 @@ async function getEbayAccessToken() {
     {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Basic ${config.ebayBase64}`
+        Authorization: `Basic ${process.env.EBAY_BASE64}`
       }
     }
   );
@@ -638,7 +648,7 @@ app.get('/product', async (req, res) => {
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${config.ebayBase64}`,
+          Authorization: `Basic ${process.env.EBAY_BASE64}`,
         },
       }
     );
