@@ -947,18 +947,6 @@ a,
   background-color: #e6b842;
 }
 
-@media (max-width: 768px) {
-    .custom-buttons {
-        flex-direction: column; /* Бутоните се подреждат вертикално */
-        align-items: flex-end;  /* Подравняване вдясно */
-    }
-    
-    .info-btn {
-        margin-left: 0;
-        margin-bottom: 8px; /* Разстояние между бутоните */
-        width: auto;       /* Ширина според съдържанието */
-    }
-}
 .info-section {
   background: #f9f9f9;
   padding: 20px;
@@ -1356,14 +1344,7 @@ button:disabled {
   color: #d00;
 }
 
-/* За мобилни устройства - бутонът да пада на нов ред */
-@media (max-width: 768px) {
-  .delivery-info-link {
-    display: block;
-    margin: 8px 0 0;
-    margin-left: 0;
-  }
-}
+
 .site-footer {
   background-color: #111;
   color: #eee;
@@ -1408,7 +1389,52 @@ button:disabled {
     margin: 6px;
   }
 }
+/* Десктоп версия (остава непроменена) */
+.uiverse-btn {
+  color: #090909;
+  padding: 0.35em 0.85em;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 0.4em;
+  background: #e8e8e8;
+  cursor: pointer;
+  border: 1px solid #e8e8e8;
+  transition: all 0.3s;
+  box-shadow: 4px 4px 8px #c5c5c5, -4px -4px 8px #ffffff;
+  display: inline-block;
+  margin: 4px;
+}
 
+.uiverse-btn:active {
+  color: #666;
+  box-shadow: inset 3px 3px 8px #c5c5c5, inset -3px -3px 8px #ffffff;
+}
+
+@media (max-width: 768px) {
+  .custom-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 6px;
+    padding: 8px 15px 8px 2px; /* Променено: 5px left, 15px right */
+    margin: 0 auto;
+    width: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    justify-content: flex-start;
+  }
+
+  /* Останалите стилове остават същите */
+  .custom-buttons::-webkit-scrollbar {
+    display: none;
+  }
+
+  .uiverse-btn {
+    flex-shrink: 0;
+    margin: 0;
+    white-space: nowrap;
+  }
+}
 
 
 
