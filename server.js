@@ -544,35 +544,35 @@ app.get('/api/resolve-id', async (req, res) => {
 
   const itemId = match[1];
 
-  try {
-    const accessToken = await getEbayAccessToken();
-    console.log("🔑 [US] Access Token:", accessToken);
-    const ebayRes = await axios.get(`https://api.ebay.com/buy/browse/v1/item/v1|${itemId}|0`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
-      }
-    });
+try {
+  const accessToken = await getEbayAccessToken();
+  console.log("🔑 [US] Access Token:", accessToken);
+  const ebayRes = await axios.get(`https://api.ebay.com/buy/browse/v1/item/v1|${itemId}|0`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
+    }
+  });
 
-    const item = ebayRes.data;
+  const item = ebayRes.data;
 
-    const result = {
-      itemId: item.itemId,
-      title: item.title || 'Неизвестен продукт',
-      priceBGN: item.price?.value ? Math.round(parseFloat(item.price.value) * 1.95) : 0,
-      region: 'global',
-      query: 'custom'
-    };
+  const result = {
+    itemId: item.itemId,
+    title: item.title || 'Неизвестен продукт',
+    priceBGN: item.price?.value ? Math.round(parseFloat(item.price.value) * 1.95) : 0,
+    region: 'global',
+    query: 'custom'
+  };
 
-    console.log('🔗 Резолвнат eBay линк:', rawUrl);
-    console.log('👉 Генериран itemId:', result.itemId);
+  console.log('🔗 Резолвнат eBay линк:', rawUrl);
+  console.log('👉 Генериран itemId:', result.itemId);
 
-    res.json(result);
-  } catch (err) {
-    console.error('❌ eBay ID resolution error:', err);
-    res.json({ error: 'Неуспешна заявка към eBay' });
-  }
-});
+  return res.json(result); // ✅ добави return тук
+} catch (err) {
+  console.error('❌ eBay ID resolution error:', err);
+  return res.json({ error: 'Неуспешна заявка към eBay' }); // ✅ и тук също
+}
+
 
 
 
@@ -597,18 +597,18 @@ app.get('/api/resolve-id', async (req, res) => {
     });
 
     const item = ebayRes.data;
-    res.json({
+    return res.json({
       itemId: item.itemId,
       title: item.title,
-      priceBGN: 0, // По избор можеш да добавиш калкулация
+      priceBGN: 0,
       query: 'custom',
       region: 'europe'
     });
   } catch (err) {
     console.error('❌ eBay ID resolution error:', err);
-    res.status(500).json({ error: 'Failed to resolve eBay itemId' });
+    return res.status(500).json({ error: 'Failed to resolve eBay itemId' }); // ✅ Избираме само един отговор
   }
-});
+
 
 
 
