@@ -56,5 +56,14 @@
       <p>Връщането към доставчика (в Европа или Англия) обикновено е безплатно. Клиентът поема единствено разходите по изпращането до съответната страна.</p>
     </div>
   </section>
+  <script>
+  document.querySelector('.close-info-btn').addEventListener('click', () => {
+    if (document.referrer) {
+      window.location.href = document.referrer;
+    } else {
+      window.location.href = 'index.html'; // fallback ако е отворено директно
+    }
+  });
+</script>
 </body>
 </html>

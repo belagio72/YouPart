@@ -91,7 +91,7 @@
     <input type="checkbox" id="termsCheckbox" />
     <label for="termsCheckbox" class="terms-label">
       Запознат съм и съм съгласен с<br>
-      <a href="index.html#delivery-returns">условията на доставка и връщане</a>
+      <a href="delivery-returns.html">условията на доставка и връщане</a>
     </label>
   </div>
 
@@ -234,8 +234,10 @@ function showCheckout() {
 
     function toggleExtraCharge() {
       const section = document.getElementById('extraChargeInputs');
-      section.style.display = section.style.display === 'none' ? 'block' : 'none';
+      const isHidden = window.getComputedStyle(section).display === 'none';
+      section.style.display = isHidden ? 'block' : 'none';
     }
+
 
     async function submitOrder() {
       const name = document.getElementById('name').value.trim();
