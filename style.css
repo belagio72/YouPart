@@ -898,7 +898,42 @@ select, input {
   font-weight: 600;
 }
 
+.subcategory {
+  background-color: #F2F2F2;
+  color: #444;
+  border: 1px solid #D0D0D0;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 14px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+}
 
+/* Стил при посочване с мишката */
+.subcategory:hover {
+  background-color: #E0E0E0;
+  transform: translateY(-1px);
+}
+
+/* Стил за активно (избрано) балонче - ТОЗИ ТРЯБВА ДА ЗАПАЗИТЕ! */
+.subcategory.active {
+  background-color: #FFD25C; /* Жълт цвят */
+  color: #000;
+  font-weight: 600;
+  border-color: #e6b842;
+}
+@media (max-width: 768px) {
+  .category-column {
+    width: 100%;
+  }
+  
+  .subcategories {
+    /* Върнете оригиналния стил */
+    flex-wrap: wrap;
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
+}
 /* Общ стил за кликаеми елементи */
 button,
 a,

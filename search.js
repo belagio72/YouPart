@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-// Функция за зареждане на категориите
+    // Функция за зареждане на категориите
     async function loadCategories() {
       try {
         const res = await fetch('parts_categories.json');
@@ -188,9 +188,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
           
           const div = document.createElement('div');
+          div.className = 'subcategories';
           category.children.forEach(subCategory => {
             const button = document.createElement('button');
             button.textContent = subCategory.bg.replace(/^- /, '');
+            button.className = 'subcategory'; // 👈 Добавяме клас subcategory
             button.onclick = () => {
               partInput.value = subCategory.en;
               searchBtn.click();
@@ -216,9 +218,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           });
         });
+
+        // След като са заредени категориите, настройваме подкатегориите
+        setupSubcategories();
       } catch (err) {
         console.error('Грешка при зареждане на категориите:', err);
       }
+    }
+
+    // Функция за настройване на подкатегориите
+    function setupSubcategories() {
+      const subcategories = document.querySelectorAll('.subcategory');
+      subcategories.forEach(sub => {
+        sub.addEventListener('click', function() {
+          // Премахваме активния клас от всички подкатегории
+          subcategories.forEach(item => {
+            item.classList.remove('active');
+          });
+          // Добавяме активен клас към текущата подкатегория
+          this.classList.add('active');
+        });
+      });
     }
 
     // Обновяване на URL с параметрите на търсенето
