@@ -823,25 +823,26 @@ app.post('/create-checkout-session', async (req, res) => {
     total += parseFloat(extraCharge || 0);
 
     const totalAmount = Math.round(total * 100); // Stripe очаква в стотинки
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'bgn',
-            product_data: {
-              name: `Поръчка #${orderNumber}`
-            },
-            unit_amount: totalAmount
-          },
-          quantity: 1
-        }
-      ],
-      mode: 'payment',
-      success_url: 'http://localhost:3000/success.html',
-      cancel_url: 'http://localhost:3000/cancel.html'
-    });
+    const DOMAIN = process.env.DOMAIN || 'http://localhost:3000';
+    
+const session = await stripe.checkout.sessions.create({
+  payment_method_types: ['card'],
+  line_items: [
+    {
+      price_data: {
+        currency: 'bgn',
+        product_data: {
+          name: `Поръчка #${orderNumber}`
+        },
+        unit_amount: totalAmount
+      },
+      quantity: 1
+    }
+  ],
+  mode: 'payment',
+  success_url: `${DOMAIN}/success.html`,
+  cancel_url: `${DOMAIN}/cancel.html`
+});
 
     res.json({ url: session.url });
 

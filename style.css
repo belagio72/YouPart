@@ -1,6 +1,6 @@
 /* 📦 Основни стилове */
 :root {
-  --primary: #000000;
+  --primary: #4085c3;
   --primary-dark: #1E40AF;
   --accent: #FFD25C;
   --accent-hover: #D97706;
@@ -199,6 +199,17 @@ header {
   gap: 15px;
   margin-bottom: 15px;
 }
+.red-word {
+  color: #F72616;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+@media (max-width: 768px) {
+  .red-word {
+    font-size: 1.3em !important;
+  }
+}
+
 
 select, input {
   width: 100%;
@@ -546,35 +557,15 @@ select, input {
   margin-top: 25px;
 }
 
-.btn {
-  padding: 12px 25px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: center;
-  text-decoration: none;
-}
 
-.btn-primary {
-  background-color: var(--primary);
-  color: white;
-  border: none;
-}
 
-.btn-primary:hover {
-  background-color: var(--primary-dark);
-}
 
-.btn-secondary {
-  background-color: var(--gray-light);
-  color: var(--text);
-  border: none;
-}
 
-.btn-secondary:hover {
-  background-color: var(--gray-medium);
-}
+
+
+
+
+
 
 .success-message {
   color: #10B981;
@@ -642,9 +633,7 @@ select, input {
     flex-direction: column;
   }
 
-  .btn {
-    width: 100%;
-  }
+  
 }
 /* 🛒 Количка */
 .cart-container {
@@ -1233,9 +1222,7 @@ a {
   }
 
   .extra-charge-section button,
-  .order-row button {
-    width: 100%;
-  }
+  
 }
 .confirmation-message {
   position: fixed;
@@ -1261,10 +1248,7 @@ a {
   display: none;
 }
 button.disabled,
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+
 .confirmation-message {
   margin-top: 10px;
   padding: 10px;
@@ -1451,8 +1435,47 @@ button:disabled {
   background-color: #b80000;
 }
 
+:root {
+  --primary: #F72616;
+  --primary-dark: #d00;
+  --secondary: #F3F4F6;
+  --secondary-dark: #E5E7EB;
+  --text: #111827;
+}
 
+/* Общ стил за всички бутони */
+.btn {
+  padding: 12px 25px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 1rem;
+  font-family: 'Sansation', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  border: none;
+}
 
+/* Основен бутон – червен */
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+}
 
+/* Вторичен бутон – сив */
+.btn-secondary {
+  background-color: var(--secondary);
+  color: var(--text);
+}
+.btn-secondary:hover {
+  background-color: var(--secondary-dark);
+}
 
-
+/* Деактивиран */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
