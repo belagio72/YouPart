@@ -1,26 +1,31 @@
-// 📁 server.js — коригирана версия
+// 📁 server.js — актуализирана версия
 require('dotenv').config(); // Трябва да е най-отгоре
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
-const getToken = require('./getToken');
-const getEbayToken = require('./getToken');
 const ordersPath = path.join(__dirname, 'orders.json');
-const telegramBotToken = '8074091356:AAHlninDNL8XFeKxJXs4q6EF5FG0qcrnF7U';     // 🔁 сложи своя токен
-const telegramChatId = '7367702928';              // 🔁 ID на канала/потребителя
-const endpointSecret = 'whsec_438c8a2914506ac227f6c787caeeb2948f8be00345b61c0fcb892e78e6f45222'; // ще го вземем от Stripe по-късно
+const telegramBotToken = '8074091356:AAHlninDNL8XFeKxJXs4q6EF5FG0qcrnF7U';
+const telegramChatId = '7367702928';
+const endpointSecret = 'whsec_438c8a2914506ac227f6c787caeeb2948f8be00345b61c0fcb892e78e6f45222';
 const settingsPath = path.join(__dirname, 'settings.json');
 const nodemailer = require('nodemailer');
-nodemailer.createTestAccount().then(testAccount => {
-  console.log('User:', testAccount.user);
-  console.log('Pass:', testAccount.pass);
+
+// Конфигурация за Zoho Mail
+const transporter = nodemailer.createTransport({
+  host: "smtp.zoho.eu",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "contact@youpart.net",
+    pass: "Bg995511" // Паролата за Zoho акаунта
+  }
 });
 
-// 🔐 Telegram конфигурация
+// Telegram конфигурация
 const TELEGRAM_BOT_TOKEN = '8074091356:AAHlninDNL8XFeKxJXs4q6EF5FG0qcrnF7U';
-const TELEGRAM_CHAT_ID = '7367702928'; // в кавички!
+const TELEGRAM_CHAT_ID = '7367702928';
 const TELEGRAM_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
 const app = express();
@@ -28,8 +33,6 @@ const { registerUser, loginUser } = require('./auth');
 app.use(express.json());
 app.post('/api/register', registerUser);
 app.post('/api/login', loginUser);
-
-
 
 function loadSettings() {
   try {
@@ -56,8 +59,6 @@ app.post('/api/settings', (req, res) => {
   }
 });
 
-
-
 const MESSAGES_FILE = path.join(__dirname, 'messages.json');
 let messages = [];
 
@@ -80,64 +81,54 @@ app.use((req, res, next) => {
 app.use('/webhook', express.raw({ type: 'application/json' }));
 app.use(express.static(__dirname));
 
-app.post('/api/message', (req, res) => {
+// Актуализиран endpoint за съобщения
+app.post('/api/message', async (req, res) => {
   const { name, contact, message } = req.body;
 
   if (!name || !contact || !message) {
     return res.status(400).json({ error: 'Всички полета са задължителни.' });
   }
 
-  const entry = {
-    id: Date.now(),
-    name,
-    contact,
-    message,
-    date: new Date().toISOString()
-  };
-
-  let messages = [];
-  if (fs.existsSync(MESSAGES_FILE)) {
-    try {
-      messages = JSON.parse(fs.readFileSync(MESSAGES_FILE, 'utf-8'));
-    } catch (e) {
-      console.error('⚠️ Грешка при четене на messages.json:', e.message);
-    }
-  }
-
-  messages.push(entry);
-
   try {
-    fs.writeFileSync(MESSAGES_FILE, JSON.stringify(messages, null, 2), 'utf-8');
-    console.log('📩 Записано съобщение:', entry);
+    // Записване на съобщението
+    let messages = [];
+    if (fs.existsSync(MESSAGES_FILE)) {
+      messages = JSON.parse(fs.readFileSync(MESSAGES_FILE, 'utf-8'));
+    }
+    
+    const newMessage = {
+      id: Date.now(),
+      name,
+      contact,
+      message,
+      date: new Date().toISOString()
+    };
+    
+    messages.push(newMessage);
+    fs.writeFileSync(MESSAGES_FILE, JSON.stringify(messages, null, 2));
 
-    const telegramMessage = `📥 НОВО СЪОБЩЕНИЕ:\n👤 ${entry.name}\n📧 ${entry.contact}\n💬 ${entry.message}`;
+    // Изпращане на имейл до администратора
+    const mailOptions = {
+      from: '"YouPart" <contact@youpart.net>',
+      to: 'contact@youpart.net',
+      subject: 'Ново съобщение от контактната форма',
+      text: `Име: ${name}\nКонтакт: ${contact}\nСъобщение: ${message}`
+    };
 
-    console.log('🧪 Изпращам към Telegram:', TELEGRAM_URL, telegramMessage);
+    await transporter.sendMail(mailOptions);
+    console.log('📧 Имейл изпратен до администратора');
 
-    fetch(TELEGRAM_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: telegramMessage
-      })
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (!data.ok) {
-          console.error('⚠️ Грешка при изпращане към Telegram:', data.description);
-        } else {
-          console.log('📨 Изпратено съобщение към Telegram');
-        }
-      })
-      .catch(err => {
-        console.error('❌ Telegram error:', err.message);
-      });
+    // Изпращане към Telegram
+    const telegramMessage = `📥 НОВО СЪОБЩЕНИЕ:\n👤 ${name}\n📧 ${contact}\n💬 ${message}`;
+    await axios.post(TELEGRAM_URL, {
+      chat_id: TELEGRAM_CHAT_ID,
+      text: telegramMessage
+    });
 
     res.json({ success: true });
   } catch (err) {
-    console.error('❌ Записът не успя:', err.message);
-    res.status(500).json({ error: 'Грешка при запис.' });
+    console.error('❌ Грешка при обработка на съобщението:', err);
+    res.status(500).json({ error: 'Грешка при изпращане' });
   }
 });
 
@@ -154,6 +145,7 @@ app.post('/register', async (req, res) => {
 
   res.json({ success: true, message: 'Успешна регистрация' });
 });
+
 app.post('/api/settings', (req, res) => {
   const { markup } = req.body;
 
@@ -190,29 +182,22 @@ app.post('/admin/update-note', (req, res) => {
   }
 });
 
-
-
 app.post('/admin/archive', (req, res) => {
   const { orderNumber } = req.body;
 
   try {
-    // Прочети текущите поръчки
     const orders = JSON.parse(fs.readFileSync(ordersPath, 'utf-8'));
-    // Прочети архива
     const archive = fs.existsSync(path.join(__dirname, 'archive.json')) ? 
       JSON.parse(fs.readFileSync(path.join(__dirname, 'archive.json'), 'utf-8')) : [];
     
-    // Намери поръчката за архивиране
     const orderToArchive = orders.find(order => order.orderNumber === orderNumber);
     if (!orderToArchive) {
       return res.status(404).json({ success: false, error: 'Поръчката не е намерена' });
     }
 
-    // Добави поръчката в архива
     archive.push(orderToArchive);
     fs.writeFileSync(path.join(__dirname, 'archive.json'), JSON.stringify(archive, null, 2));
 
-    // Премахни поръчката от активните
     const updatedOrders = orders.filter(order => order.orderNumber !== orderNumber);
     fs.writeFileSync(ordersPath, JSON.stringify(updatedOrders, null, 2));
 
@@ -253,57 +238,41 @@ async function updateExchangeRates() {
 updateExchangeRates();
 setInterval(updateExchangeRates, 3600000);
 
-const ORDERS_FILE = path.join(__dirname, 'orders.json');
-let orders = [];
-if (fs.existsSync(ordersPath)) {
-  const raw = fs.readFileSync(ordersPath, 'utf-8');
+// Актуализирана функция за потвърдителни имейли
+async function sendConfirmationEmail(order) {
   try {
-    orders = raw.trim() ? JSON.parse(raw) : [];
+    const emailTemplatePath = path.join(__dirname, 'email_template.json');
+    const templateRaw = fs.readFileSync(emailTemplatePath, 'utf-8');
+    const template = JSON.parse(templateRaw);
+
+    const extra = parseFloat(order.extraCharge) || 0;
+    const productList = order.items.map(item => 
+      `🔹 ${item.title}\n💰 ${item.priceBGN} лв. / ${item.priceEUR} €\n`
+    ).join('\n');
+
+    const totalAmount = order.items.reduce((sum, item) => 
+      sum + parseFloat(item.priceBGN), 0) + extra;
+
+    const emailBody = template.body
+      .replace('{{name}}', order.name)
+      .replace('{{orderNumber}}', order.orderNumber)
+      .replace('{{productList}}', productList)
+      .replace('{{extraCharge}}', extra.toFixed(2))
+      .replace('{{totalAmount}}', totalAmount.toFixed(2));
+
+    // Използване на Zoho транспортера
+    await transporter.sendMail({
+      from: '"YouPart" <contact@youpart.net>',
+      to: order.email,
+      subject: template.subject,
+      text: emailBody
+    });
+
+    console.log('📧 Имейл за потвърждение изпратен до клиента:', order.email);
   } catch (err) {
-    console.warn('⚠️ Грешка при парсване на orders.json, използваме празен масив');
-    orders = [];
+    console.error('❌ Грешка при изпращане на потвърдителен имейл:', err);
   }
 }
-async function sendConfirmationEmail(order) {
-  const emailTemplatePath = path.join(__dirname, 'email_template.json');
-  const templateRaw = fs.readFileSync(emailTemplatePath, 'utf-8');
-  const template = JSON.parse(templateRaw);
-
-  const extra = parseFloat(order.extraCharge) || 0;
-
-  // Създаваме списък с продукти в текстов вид
-  const productList = order.items.map(item => {
-    return `🔹 ${item.title}\n💰 ${item.priceBGN} лв. / ${item.priceEUR} €\n`;
-  }).join('\n');
-
-  const totalAmount = order.items.reduce((sum, item) => sum + parseFloat(item.priceBGN), 0) + extra;
-
-  const emailBody = template.body
-    .replace('{{name}}', order.name)
-    .replace('{{orderNumber}}', order.orderNumber)
-    .replace('{{productList}}', productList)
-    .replace('{{extraCharge}}', extra.toFixed(2))
-    .replace('{{totalAmount}}', totalAmount.toFixed(2));
-
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    auth: {
-      user: 'x5jmjjnhqcyrwafh@ethereal.email',  // ← Твоят имейл
-      pass: '2EY458geNZxdWhgzth'               // ← Твоята парола
-    }
-  });
-
-  await transporter.sendMail({
-    from: '"PartsZone" <noreply@partszone.com>',
-    to: order.email,
-    subject: template.subject,
-    text: emailBody
-  });
-
-  console.log('📧 Имейл изпратен до клиента:', order.email);
-}
-
 
 app.post('/order', async (req, res) => {
   console.log('📥 Получена заявка за поръчка');
@@ -355,7 +324,7 @@ app.post('/order', async (req, res) => {
     orders.push(newOrder);
     fs.writeFileSync(ordersPath, JSON.stringify(orders, null, 2));
     console.log('📦 Записана поръчка:', newOrder);
-    await sendConfirmationEmail(newOrder); // 🟢 Изпращаме имейл
+    await sendConfirmationEmail(newOrder);
 
     res.json({ success: true, orderNumber: newOrderNumber });
   } catch (err) {
@@ -392,7 +361,7 @@ app.get('/search', async (req, res) => {
   let query = req.query.part;
   const offset = parseInt(req.query.offset || '0');
   const region = req.query.region || 'europe';
-  const condition = req.query.condition || 'used'; // Добавено: параметър за състояние
+  const condition = req.query.condition || 'used';
 
   if (query === 'random') {
     const sampleWords = ['brake', 'bumper', 'headlight', 'rims', 'liftgate'];
@@ -416,50 +385,46 @@ app.get('/search', async (req, res) => {
       }
     );
 
-    // Променено: Добавяне на филтър за състояние
     const filters = {};
     if (condition === 'used') {
-      filters['filter'] = 'conditionIds:{3000}'; // eBay condition ID за употребявани
+      filters['filter'] = 'conditionIds:{3000}';
     } else if (condition === 'new') {
-      filters['filter'] = 'conditionIds:{1000}'; // eBay condition ID за нови
+      filters['filter'] = 'conditionIds:{1000}';
     }
     
     const accessToken = tokenRes.data.access_token;
-
     const marketplaceId = region === 'global' ? 'EBAY_US' : 'EBAY_GB';
 
-const baseFilters = region === 'europe'
-  ? {
-      filter: 'sellerLocationCountry:GB',
-      delivery_postal_code: 'WC2N5DU',
-      fieldgroups: 'EXTENDED'
-    }
-  : {};
+    const baseFilters = region === 'europe'
+      ? {
+          filter: 'sellerLocationCountry:GB',
+          delivery_postal_code: 'WC2N5DU',
+          fieldgroups: 'EXTENDED'
+        }
+      : {};
 
-// Добавяме филтрите за състояние към базовите филтри
-const finalFilters = {
-  ...baseFilters,
-  ...(condition === 'used' ? { filter: (baseFilters.filter ? baseFilters.filter + ',' : '') + 'conditionIds:{3000}' } : {}),
-  ...(condition === 'new' ? { filter: (baseFilters.filter ? baseFilters.filter + ',' : '') + 'conditionIds:{1000}' } : {})
-};
+    const finalFilters = {
+      ...baseFilters,
+      ...(condition === 'used' ? { filter: (baseFilters.filter ? baseFilters.filter + ',' : '') + 'conditionIds:{3000}' } : {}),
+      ...(condition === 'new' ? { filter: (baseFilters.filter ? baseFilters.filter + ',' : '') + 'conditionIds:{1000}' } : {})
+    };
 
-const ebayRes = await axios.get('https://api.ebay.com/buy/browse/v1/item_summary/search', {
-  headers: {
-    Authorization: `Bearer ${accessToken}`,
-    'X-EBAY-C-MARKETPLACE-ID': marketplaceId
-  },
-  params: {
-    q: translatedQuery,
-    limit: 20,
-    offset,
-    buying_options: 'FIXED_PRICE',
-    sort: 'bestMatch',
-    ...finalFilters
-  }
-});
+    const ebayRes = await axios.get('https://api.ebay.com/buy/browse/v1/item_summary/search', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'X-EBAY-C-MARKETPLACE-ID': marketplaceId
+      },
+      params: {
+        q: translatedQuery,
+        limit: 20,
+        offset,
+        buying_options: 'FIXED_PRICE',
+        sort: 'bestMatch',
+        ...finalFilters
+      }
+    });
 
     const items = ebayRes.data.itemSummaries || [];
-
     const settings = loadSettings();
     const markup = settings.markup || 1.2;
 
@@ -468,7 +433,6 @@ const ebayRes = await axios.get('https://api.ebay.com/buy/browse/v1/item_summary
         const priceValue = parseFloat(item?.price?.value) || 0;
         const shippingCost = parseFloat(item?.shippingOptions?.[0]?.shippingCost?.value) || 0;
         const totalPrice = priceValue + shippingCost;
-
         const currency = item.price.currency;
 
         let priceBGN = '—';
@@ -563,72 +527,11 @@ app.get('/api/resolve-id', async (req, res) => {
   }
 });
 
-
-
-// ✅ Стъпка 1: Добави този маршрут в server.js
-app.get('/api/resolve-id', async (req, res) => {
-  const ebayLink = req.query.url;
-  const match = ebayLink.match(/\/itm\/(\d+)/);
-  if (!match) {
-    return res.status(400).json({ error: 'Invalid eBay URL format.' });
-  }
-
-  const numericId = match[1];
-
-  try {
-    const accessToken = await getEbayAccessToken();
-    const ebayRes = await axios.get(`https://api.ebay.com/buy/browse/v1/item/${numericId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-EBAY-C-MARKETPLACE-ID': 'EBAY_GB'
-      }
-    });
-
-    const item = ebayRes.data;
-    res.json({
-      itemId: item.itemId,
-      title: item.title,
-      priceBGN: 0, // По избор можеш да добавиш калкулация
-      query: 'custom',
-      region: 'europe'
-    });
-  } catch (err) {
-    console.error('❌ eBay ID resolution error:', err);
-    res.status(500).json({ error: 'Failed to resolve eBay itemId' });
-  }
-});
-
-
-
-
-app.get('/api/settings', (req, res) => {
-  try {
-    const settings = loadSettings();
-    res.json(settings);
-  } catch (err) {
-    console.error('⚠️ Грешка при зареждане на настройки:', err.message);
-    res.status(500).json({ error: 'Грешка при зареждане на настройки' });
-  }
-});
-
-    app.get('/api/settings', (req, res) => {
-  try {
-    const data = fs.readFileSync(settingsPath, 'utf-8');
-    res.json(JSON.parse(data));
-  } catch (err) {
-    console.error('⚠️ settings.json не може да се прочете:', err.message);
-    res.status(500).json({ error: 'Грешка при четене на настройки' });
-  }
-});
-
-
-
 app.get('/product', async (req, res) => {
   const id = req.query.id;
   if (!id) return res.status(400).json({ error: 'Missing item ID' });
 
   try {
-    // Вземане на access token
     const tokenRes = await axios.post(
       'https://api.ebay.com/identity/v1/oauth2/token',
       new URLSearchParams({
@@ -643,11 +546,9 @@ app.get('/product', async (req, res) => {
       }
     );
 
-    const accessToken = tokenRes.data.access_token; // Това е критично важният ред
-
-    // Вземане на детайли за продукта от eBay
+    const accessToken = tokenRes.data.access_token;
     const ebayRes = await axios.get(`https://api.ebay.com/buy/browse/v1/item/${id}`, {
-      headers: { Authorization: `Bearer ${accessToken}` }, // Сега accessToken е дефиниран
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
 
     const item = ebayRes.data;
@@ -662,7 +563,6 @@ app.get('/product', async (req, res) => {
       priceEUR = (bgn / exchangeRates.BGN * exchangeRates.EUR).toFixed(2);
     }
 
-    // Снимки
     const images = [];
     if (item.image?.imageUrl) images.push(item.image.imageUrl);
     if (item.additionalImages) {
@@ -696,34 +596,6 @@ app.get('/product', async (req, res) => {
   }
 });
 
-
-app.post('/api/message', (req, res) => {
-  const { name, contact, message } = req.body;
-
-  if (!name || !contact || !message) {
-    return res.status(400).json({ error: 'Всички полета са задължителни.' });
-  }
-
-  const entry = {
-    id: Date.now(),
-    name,
-    contact,
-    message,
-    date: new Date().toISOString()
-  };
-
-  messages.push(entry);
-
-  try {
-    fs.writeFileSync(MESSAGES_FILE, JSON.stringify(messages, null, 2), 'utf-8');
-  } catch (e) {
-    console.error('❌ Грешка при запис на messages.json:', e.message);
-    return res.status(500).json({ error: 'Неуспешен запис.' });
-  }
-
-  res.json({ success: true });
-});
-
 app.get('/api/messages', (req, res) => {
   if (fs.existsSync(MESSAGES_FILE)) {
     try {
@@ -748,7 +620,6 @@ app.get('/admin/archived-orders', (req, res) => {
   }
 });
 
-
 app.get('/admin/orders', (req, res) => {
   try {
     const data = fs.readFileSync(ordersPath, 'utf-8');
@@ -760,7 +631,6 @@ app.get('/admin/orders', (req, res) => {
   }
 });
 
-// Коригиран endpoint за архив (премахване на дублирания)
 app.get('/admin/archive', (req, res) => {
   try {
     const archivePath = path.join(__dirname, 'archive.json');
@@ -770,14 +640,13 @@ app.get('/admin/archive', (req, res) => {
     
     const rawData = fs.readFileSync(archivePath, 'utf-8');
     const archiveData = rawData.trim() ? JSON.parse(rawData) : [];
-    res.json({ orders: archiveData }); // Връщаме обект с ключ "orders"
+    res.json({ orders: archiveData });
     
   } catch (err) {
     console.error('❌ Грешка при четене на архива:', err);
     res.status(500).json({ error: 'Неуспешно зареждане на архива' });
   }
 });
-
 
 app.post('/api/reply', (req, res) => {
   const { id, reply } = req.body;
@@ -825,24 +694,28 @@ app.post('/create-checkout-session', async (req, res) => {
     const totalAmount = Math.round(total * 100); // Stripe очаква в стотинки
     const DOMAIN = process.env.DOMAIN || 'http://localhost:3000';
     
-const session = await stripe.checkout.sessions.create({
-  payment_method_types: ['card'],
-  line_items: [
-    {
-      price_data: {
-        currency: 'bgn',
-        product_data: {
-          name: `Поръчка #${orderNumber}`
-        },
-        unit_amount: totalAmount
-      },
-      quantity: 1
-    }
-  ],
-  mode: 'payment',
-  success_url: `${DOMAIN}/success.html`,
-  cancel_url: `${DOMAIN}/cancel.html`
-});
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'bgn',
+            product_data: {
+              name: `Поръчка #${orderNumber}`
+            },
+            unit_amount: totalAmount
+          },
+          quantity: 1
+        }
+      ],
+      mode: 'payment',
+      success_url: `${DOMAIN}/success.html`,
+      cancel_url: `${DOMAIN}/cancel.html`,
+      // Добавете метаданни за orderNumber
+      metadata: {
+        orderNumber: orderNumber
+      }
+    });
 
     res.json({ url: session.url });
 
@@ -852,8 +725,6 @@ const session = await stripe.checkout.sessions.create({
   }
 });
 
-
-
 app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   const sig = req.headers['stripe-signature'];
 
@@ -865,75 +736,34 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    const orderNumber = session.metadata?.orderNumber;
+if (event.type === 'checkout.session.completed') {
+  const session = event.data.object;
+  const orderNumber = session.client_reference_id; // ✅ вече правилно
 
-    console.log('✅ Успешно плащане за поръчка:', orderNumber);
+  console.log('✅ Успешно плащане за поръчка:', orderNumber);
 
-    if (orderNumber) {
-      const ordersPath = path.join(__dirname, 'orders.json');
-      try {
-        const orders = JSON.parse(fs.readFileSync(ordersPath, 'utf-8'));
-        const updatedOrders = orders.map(order => {
-          if (order.orderNumber === orderNumber) {
-            return { ...order, paymentStatus: 'платена' };
-          }
-          return order;
-        });
+  if (orderNumber) {
+    const ordersPath = path.join(__dirname, 'orders.json');
+    try {
+      const orders = JSON.parse(fs.readFileSync(ordersPath, 'utf-8'));
+      const updatedOrders = orders.map(order => {
+        if (order.orderNumber === orderNumber) {
+          return { ...order, paymentStatus: 'платена' };
+        }
+        return order;
+      });
 
-        fs.writeFileSync(ordersPath, JSON.stringify(updatedOrders, null, 2));
-        console.log(`💾 Поръчка ${orderNumber} е отбелязана като платена.`);
-      } catch (err) {
-        console.error('❌ Грешка при обновяване на orders.json:', err);
-      }
+      fs.writeFileSync(ordersPath, JSON.stringify(updatedOrders, null, 2));
+      console.log(`💾 Поръчка ${orderNumber} е отбелязана като платена.`);
+    } catch (err) {
+      console.error('❌ Грешка при обновяване на orders.json:', err);
     }
   }
+}
+
 
   res.status(200).send();
 });
-
-app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const sig = req.headers['stripe-signature'];
-  const endpointSecret = 'whsec_...'; // замени с твоя реален Stripe webhook secret
-
-  let event;
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-  } catch (err) {
-    console.error('❌ Stripe Webhook грешка при валидация:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    const orderNumber = session.metadata?.orderNumber;
-
-    console.log('✅ Успешно плащане за поръчка:', orderNumber);
-
-    if (orderNumber) {
-      const ordersPath = path.join(__dirname, 'orders.json');
-      try {
-        const orders = JSON.parse(fs.readFileSync(ordersPath, 'utf-8'));
-        const updatedOrders = orders.map(order => {
-          if (order.orderNumber === orderNumber) {
-            return { ...order, paymentStatus: 'платена' };
-          }
-          return order;
-        });
-
-        fs.writeFileSync(ordersPath, JSON.stringify(updatedOrders, null, 2));
-        console.log(`💾 Поръчка ${orderNumber} е отбелязана като платена.`);
-      } catch (err) {
-        console.error('❌ Грешка при обновяване на orders.json:', err);
-      }
-    }
-  }
-
-  res.status(200).send();
-});
-
-
 
 app.listen(3000, () => {
   console.log('🚀 Server running at http://localhost:3000');

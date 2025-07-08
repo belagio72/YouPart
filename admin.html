@@ -33,6 +33,11 @@
       font-weight: bold;
       margin-left: 10px;
     }
+    .unpaid-badge {
+      color: red;
+      font-weight: bold;
+      margin-left: 10px;
+    }
   </style>
 </head>
 <body>
@@ -45,9 +50,6 @@
     <div id="resultLink" style="margin-top: 10px;"></div>
   </div>
 
-
-
-<!-- 1. Формата за вход остава НЕПРОМЕНЕНА -->
 <div id="login-form">
   <h2>Вход за администратор</h2>
   <input id="username" placeholder="Потребителско име" /><br><br>
@@ -56,7 +58,6 @@
   <p id="login-error" style="color: red;"></p>
 </div>
 
-<!-- 2. Админ панелът остава НЕПРОМЕНЕН (освен бутона за изход) -->
 <div id="admin-panel">
   <h1>Админ панел</h1>
   <button onclick="logout()" style="float:right;">Изход</button>
@@ -68,16 +69,15 @@
     <button class="tab-btn" onclick="showTab('settings')">Настройки</button>
   </div>
 
-  <!-- 3. Табовете остават НЕПРОМЕНЕНИ -->
   <div id="orders" class="tab-content active">
     <h2>Поръчки</h2>
-    <div id="orders-list"></div> <!-- Тук ще се показват поръчките -->
+    <div id="orders-list"></div>
   </div>
 
   <div id="archive" class="tab-content">
-  <h2>Архивирани поръчки</h2>
-  <div id="archive-list">Зареждане...</div>
-</div>
+    <h2>Архивирани поръчки</h2>
+    <div id="archive-list">Зареждане...</div>
+  </div>
 
   <div id="accounts" class="tab-content">
     <h2>Акаунти</h2>
@@ -85,14 +85,14 @@
   </div>
 
   <div id="settings" class="tab-content">
-    <label>Markup (%):</label>
-    <input type="number" id="markupInput" step="0.01">
+    <label>Надценка (%):</label>
+    <input type="number" id="markupInput" step="0.01" min="5" max="100">
     <button onclick="saveMarkup()">Запази</button> 
   </div>
 </div>
 
 <script>
-// Функция за зареждане на текущия markup при отваряне на страницата
+// Функция за зареждане на текущия markup
 function loadMarkup() {
   fetch('/api/settings')
     .then(response => response.json())
@@ -112,7 +112,13 @@ function saveMarkup() {
   
   // Валидация
   if (isNaN(markupValue)) {
-    alert('Моля въведете валидно число за markup');
+    alert('Моля въведете валидно число за надценка');
+    return;
+  }
+
+  // Валидация за диапазон
+  if (markupValue < 5 || markupValue > 100) {
+    alert('Надценката трябва да е между 5% и 100%');
     return;
   }
 
@@ -142,7 +148,7 @@ document.addEventListener('DOMContentLoaded', loadMarkup);
 </script>
 
 <script>
-// 4. Функциите за вход/изход остават НЕПРОМЕНЕНИ
+// Функции за вход/изход
 async function login() {
   const user = document.getElementById('username').value;
   const pass = document.getElementById('password').value;
@@ -160,11 +166,13 @@ async function login() {
 }
 
 function logout() {
-  localStorage.removeItem('adminLoggedIn');
-  location.reload();
+  if (confirm('Сигурни ли сте, че искате да излезете?')) {
+    localStorage.removeItem('adminLoggedIn');
+    location.reload();
+  }
 }
 
-// 5. Функциите за табове остават НЕПРОМЕНЕНИ
+// Функции за табове
 function showTab(tabId) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -172,9 +180,8 @@ function showTab(tabId) {
   event.target.classList.add('active');
 
   if (tabId === 'orders') fetchOrders();
-  if (tabId === 'tab-messages') fetchMessages();
-  if (tabId === 'accounts') fetchAccounts();
   if (tabId === 'archive') fetchArchive();
+  if (tabId === 'accounts') fetchAccounts();
 }
 
 function showAdminPanel() {
@@ -183,7 +190,7 @@ function showAdminPanel() {
   fetchOrders();
 }
 
-// 6. НОВА Функция за зареждане на поръчките (променена)
+// Функция за зареждане на поръчките
 async function fetchOrders() {
   const res = await fetch('/admin/orders?_=' + Date.now());
   const data = await res.json();
@@ -209,7 +216,10 @@ async function fetchOrders() {
     div.className = 'order';
     div.innerHTML = `
       <h3>Поръчка: ${order.orderNumber || '—'} 
-        
+        ${order.paymentStatus === 'платена' ? 
+          '<span class="paid-badge">✅ Платено</span>' : 
+          '<span class="unpaid-badge">❌ Неплатено</span>'}
+      </h3>
       ${itemsHtml}
       <p><strong>Име:</strong> ${order.name || '—'}</p>
       <p><strong>Имейл:</strong> ${order.email || '—'}</p>
@@ -218,7 +228,6 @@ async function fetchOrders() {
       <p><strong>Дата:</strong> ${order.date ? new Date(order.date).toLocaleString() : '—'}</p>
       
       <p><strong>Бележка:</strong></p>
-      ${order.paymentStatus === 'платена' ? '<span class="paid-badge">✅ Платено</span>' : ''}
       <textarea onchange="updateNote('${order.orderNumber}', this.value)">${order.note || ''}</textarea>
       
       <br><br>
@@ -229,7 +238,7 @@ async function fetchOrders() {
   });
 }
 
-// 7. НОВИ функции за бележки и архивиране
+// Функции за бележки и архивиране
 async function updateNote(orderNumber, note) {
   try {
     const res = await fetch('/admin/update-note', {
@@ -268,58 +277,7 @@ async function archiveOrder(orderNumber) {
   }
 }
 
-// 8. Останалите функции (за съобщения и акаунти) остават НЕПРОМЕНЕНИ
-async function fetchMessages() {
-  const container = document.getElementById('messages-list');
-  container.innerHTML = 'Зареждане...';
-
-  try {
-    const res = await fetch('/admin/messages');
-    const data = await res.json();
-
-    if (!data.messages || data.messages.length === 0) {
-      container.innerHTML = 'Няма съобщения.';
-      return;
-    }
-
-    container.innerHTML = '';
-    data.messages.forEach(msg => {
-      const thread = document.createElement('div');
-      thread.className = 'message';
-      thread.innerHTML = `
-        <h3>${msg.name} (${msg.contact})</h3>
-        <div>${msg.messages.map(m => `<p><strong>${m.from === 'admin' ? 'Админ' : 'Клиент'}:</strong> ${m.text}</p>`).join('')}</div>
-        <textarea rows="2" placeholder="Вашият отговор..."></textarea>
-        <button onclick="replyTo('${msg.clientId}', this)">Изпрати отговор</button>
-      `;
-      container.appendChild(thread);
-    });
-  } catch (err) {
-    container.innerHTML = '⚠️ Грешка при зареждане на съобщенията.';
-    console.error(err);
-  }
-}
-
-async function replyTo(clientId, btn) {
-  const textarea = btn.previousElementSibling;
-  const text = textarea.value.trim();
-  if (!text) return alert('Моля, въведете съобщение.');
-
-  const res = await fetch('/admin/reply', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ clientId, text })
-  });
-
-  const result = await res.json();
-  if (result.success) {
-    textarea.value = '';
-    await fetchMessages();
-  } else {
-    alert('Грешка при изпращане на отговор.');
-  }
-}
-
+// Функции за акаунти
 async function fetchAccounts() {
   const res = await fetch('/admin_users.json');
   const users = await res.json();
@@ -331,10 +289,28 @@ async function fetchAccounts() {
     div.className = 'account';
     div.innerHTML = `
       <h3>${u.username}</h3>
-      <p><strong>Парола:</strong> ${u.password}</p>
+      <p><strong>Парола:</strong> ********</p>
+      <button onclick="showPassword('${u.username}')">Покажи</button>
     `;
     container.appendChild(div);
   });
+}
+
+// Функция за показване на парола
+async function showPassword(username) {
+  try {
+    const res = await fetch('/admin_users.json');
+    const users = await res.json();
+    const user = users.find(u => u.username === username);
+    if (user) {
+      alert(`Парола за ${username}: ${user.password}`);
+    } else {
+      alert('Потребителят не е намерен!');
+    }
+  } catch (err) {
+    console.error('Грешка при зареждане на потребителите:', err);
+    alert('Възникна грешка!');
+  }
 }
 
 async function fetchArchive() {
@@ -369,7 +345,11 @@ async function fetchArchive() {
       const div = document.createElement('div');
       div.className = 'order';
       div.innerHTML = `
-        <h3>Поръчка: ${order.orderNumber || '—'}</h3>
+        <h3>Поръчка: ${order.orderNumber || '—'}
+          ${order.paymentStatus === 'платена' ? 
+            '<span class="paid-badge">✅ Платено</span>' : 
+            '<span class="unpaid-badge">❌ Неплатено</span>'}
+        </h3>
         ${itemsHtml}
         <p><strong>Дата:</strong> ${order.date ? new Date(order.date).toLocaleString() : '—'}</p>
         ${order.note ? `<p><strong>Бележка:</strong> ${order.note}</p>` : ''}
@@ -382,79 +362,15 @@ async function fetchArchive() {
   }
 }
 
-// 9. Проверка за логин при зареждане остава НЕПРОМЕНЕНА
+// Проверка за логин при зареждане
 if (localStorage.getItem('adminLoggedIn') === 'true') {
   showAdminPanel();
   fetchOrders();
 }
-async function loadSettings() {
-  const res = await fetch('/api/settings');
-  const data = await res.json();
-  document.getElementById('markupInput').value = data.markup;
-}
-
-async function saveMarkup() {
-  const markup = parseFloat(document.getElementById('markupInput').value);
-  console.log('📤 Изпращам markup:', markup);
-
-  const res = await fetch('/api/settings', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ markup })
-  });
-
-  const text = await res.text(); // 👈 прочитаме го като текст (не директно JSON)
-  console.log('📥 Отговор от сървъра:', text);
-
-  try {
-    const result = JSON.parse(text);
-    if (result.success) {
-      alert('✅ Настройката е запазена!');
-    } else {
-      alert('❌ Грешка при запис: ' + result.error);
-    }
-  } catch (e) {
-    console.error('❌ Грешка при JSON.parse:', e.message);
-    alert('❌ Невалиден отговор от сървъра');
-  }
-}
-
 
 </script>
 
-  <script>
-    if (!localStorage.getItem('adminLoggedIn')) {
-      document.body.innerHTML = `
-        <div style="padding: 20px;">
-          <h2>🔐 Админ вход</h2>
-          <input id="adminUser" placeholder="Потребителско име"><br><br>
-          <input id="adminPass" type="password" placeholder="Парола"><br><br>
-          <button onclick="loginAdmin()">Вход</button>
-        </div>
-      `;
-    }
-
-    async function loginAdmin() {
-      const user = document.getElementById('adminUser').value.trim();
-      const pass = document.getElementById('adminPass').value.trim();
-      try {
-        const res = await fetch('/admin_users.json');
-        const users = await res.json();
-        const match = users.find(u => u.username === user && u.password === pass);
-        if (match) {
-          localStorage.setItem('adminLoggedIn', 'true');
-          location.reload();
-        } else {
-          alert('❌ Невалидни данни за вход');
-        }
-      } catch (err) {
-        console.error('Грешка при зареждане на потребителите:', err);
-        alert('⚠️ Проблем при проверка на вход');
-      }
-    }
-  </script>
-
-  <script>
+<script>
 function generateResolvedLink() {
   const ebayLink = document.getElementById('ebayInput').value.trim();
   const customPrice = parseFloat(document.getElementById('customPrice').value.trim());
@@ -483,6 +399,8 @@ function generateResolvedLink() {
         <a href="${finalUrl}" target="_blank">${fullUrl}</a><br><br>
         <button onclick="copyToClipboard('${fullUrl}')">📋 Копирай линка</button>
       `;
+      // Автоматично скролване до резултата
+      document.getElementById('resultLink').scrollIntoView({behavior: 'smooth'});
     })
     .catch(err => {
       console.error('❌ Грешка при извличане на itemId:', err);

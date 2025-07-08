@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="bg">
 <head>
 <link href="style.css" rel="stylesheet"/>
@@ -8,7 +7,6 @@
 <title>YouPart - Търсачка за Авточасти</title>
 <link href="https://fonts.googleapis.com/css2?family=Sansation&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
 <!-- Десктоп хедър -->
@@ -33,11 +31,10 @@
       </div>
     </div>
   </header>
-<!-- Мобилен хедър -->
 <div id="mobile-header">
-  <span class="mobile-header">
-   <span class="red-word">Части</span> втора употреба от Европа и САЩ
-  </span>
+  <div class="mobile-header-top">
+  <span><span style="color:#F72616;">Части</span> втора употреба от Европа и САЩ</span>
+</div>
 
   <div class="mobile-header-bottom">
     <img src="youpart logo.png" alt="Лого">
@@ -114,7 +111,7 @@
 </div>
 <div class="form-group">
 <label for="contact-message">Описание на частта</label>
-<textarea id="contact-message" required=""></textarea>
+<textarea id="contact-message" maxlength="500" required placeholder="Вашето съобщение... (Лимит: 500 символа)"></textarea>
 </div>
 <div class="form-buttons">
 <button class="submit-btn" type="submit">Изпрати</button>
@@ -125,32 +122,77 @@
 </main>
 <script src="search.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const contactBtn = document.getElementById('contact-btn');
-      const contactForm = document.getElementById('contact-form');
-      const cancelBtn = document.getElementById('cancel-btn');
+  document.addEventListener('DOMContentLoaded', function() {
+    const contactBtn = document.getElementById('contact-btn');
+    const contactForm = document.getElementById('contact-form');
+    const cancelBtn = document.getElementById('cancel-btn');
 
-      // Отваряне на формата
-      contactBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        contactForm.classList.add('visible');
-        contactForm.scrollIntoView({ behavior: 'smooth' });
-      });
-
-      // Затваряне на формата
-      cancelBtn.addEventListener('click', function() {
-        contactForm.classList.remove('visible');
-      });
-
-      // Изпращане на формата
-      document.getElementById('contactForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Съобщението е изпратено!');
-        this.reset();
-        contactForm.classList.remove('visible');
-      });
+    // Отваряне на формата
+    contactBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      contactForm.classList.add('visible');
+      contactForm.scrollIntoView({ behavior: 'smooth' });
     });
-  </script>
+
+    // Затваряне на формата
+    cancelBtn.addEventListener('click', function() {
+      contactForm.classList.remove('visible');
+    });
+
+    // Изпращане на формата
+    document.getElementById('contactForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('contact-name').value.trim();
+      const contact = document.getElementById('contact-email').value.trim();
+      const message = document.getElementById('contact-message').value.trim();
+
+      if (!name || !contact || !message) {
+        alert('Моля, попълнете всички полета.');
+        return;
+      }
+
+      // Валидация на имейл
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(contact)) {
+        alert('Моля, въведете валиден имейл адрес.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/message', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json' 
+          },
+          body: JSON.stringify({ 
+            name, 
+            contact, 
+            message 
+          })
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || 'Грешка при изпращане');
+        }
+
+        const result = await res.json();
+        
+        if (result.success) {
+          alert('✅ Съобщението е изпратено успешно!');
+          this.reset();
+          contactForm.classList.remove('visible');
+        } else {
+          alert('⚠️ Грешка при изпращане: ' + (result.error || ''));
+        }
+      } catch (err) {
+        console.error('❌ Грешка при заявката:', err);
+        alert('❌ Възникна грешка при изпращане на съобщението: ' + err.message);
+      }
+    });
+  });
+</script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const mobileBtn = document.getElementById('mobile-contact-btn');
@@ -251,6 +293,19 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </footer>
 
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6843676fa62149190d374066/1it3ko39c';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
 
 </body>
 </html>

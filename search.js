@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const sampleWords = ['right fender', 'front bumper', 'side mirror', 'engine mount', 'tail light', 'brake disc'];
       if (!partInput.value.trim()) {
         currentQuery = sampleWords[Math.floor(Math.random() * sampleWords.length)];
-        currentRegion = 'global';
+        currentRegion = 'europe';
         currentOffset = 0;
         fetchResults();
       }
