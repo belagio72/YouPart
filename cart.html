@@ -149,7 +149,12 @@
         <button type="button" class="btn btn-primary" onclick="submitOrder()">Изпрати поръчка</button>
       </form>
       
-      <button id="payBtn" class="btn btn-primary" onclick="startCheckout()" style="display: none; margin-top: 20px;">Плати</button>
+      <p class="pay-row">
+        <button id="payBtn" class="btn btn-primary" onclick="startCheckout()" style="display: none;">Плати</button>
+        <img id="visaLogo" src="visa-logo.png" alt="Картови методи Stripe" style="display: none;">
+      </p>
+
+
     </div>
   </main>
 
@@ -331,6 +336,7 @@ if (!name || !email || !phone || !address) {
           msg.classList.add("show");
 
           payBtn.style.display = 'inline-block';
+          document.getElementById('visaLogo').style.display = 'block';
           payBtn.scrollIntoView({ behavior: 'smooth' });
 
           document.querySelector('button[onclick="submitOrder()"]').disabled = true;

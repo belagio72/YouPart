@@ -1193,7 +1193,7 @@ a {
 }
 
 .order-row input[type="checkbox"] {
-  accent-color: #2ecc71;
+  accent-color: #F62616;
   transform: scale(1.2);
   margin: 0;
 }
@@ -1613,5 +1613,24 @@ button:disabled {
     max-width: 300px;
     text-align: center;
   }
+}
+.pay-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+img#visaLogo {
+  max-height: 40px;
+  max-width: 100px;
+  display: inline;
+}
+#payBtn.btn-primary {
+  background-color: #28a745; /* например зелен */
+  border: none;
+}
+
+#payBtn.btn-primary:hover {
+  background-color: #218838;
 }
 
