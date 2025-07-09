@@ -1573,3 +1573,26 @@ button:disabled {
   background-color: #f9f9f9;
   z-index: 1;
 }
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.mobile-contact-info {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.mobile-contact-info a {
+  color: #333;
+  text-decoration: none;
+  margin: 0 6px;
+}
+
+.mobile-contact-info a:hover {
+  text-decoration: underline;
+}
+
