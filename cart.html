@@ -61,7 +61,7 @@
 </div>
 </div>
 <div class="custom-buttons">
-  <button class="uiverse-btn" onclick="location.href='index.html'">Начало</button>
+  <a class="uiverse-btn" href="index.html">Начало</a>
   <a class="uiverse-btn" href="how-it-works.html">Как работи?</a>
   <a class="uiverse-btn" href="delivery-returns.html">Доставка и връщане</a>
 </div>
@@ -167,7 +167,6 @@
       cartItems.splice(index, 1);
       localStorage.setItem('cartItems', JSON.stringify(cartItems));
       renderCart();
-  updateTotals();
       updateCartCount();
     }
 
@@ -251,6 +250,21 @@ function showCheckout() {
       const isHidden = window.getComputedStyle(section).display === 'none';
       section.style.display = isHidden ? 'block' : 'none';
     }
+    
+function updateTotals() {
+  const productTotal = cartItems.reduce((sum, item) => sum + parseFloat(item.priceBGN || 0), 0);
+  const productTotalEUR = cartItems.reduce((sum, item) => sum + parseFloat(item.priceEUR || 0), 0);
+  const extraBGN = parseInt(document.getElementById('extraBGN')?.value || 0);
+  const extraSt = parseInt(document.getElementById('extraSt')?.value || 0);
+  const extraTotal = extraBGN + (extraSt / 100);
+  const finalTotal = productTotal + extraTotal;
+  const finalTotalEUR = productTotalEUR + (extraTotal / 1.95583);
+
+  document.getElementById('productTotal').textContent = productTotal.toFixed(2) + ' лв.';
+  document.getElementById('extraTotal').textContent = extraTotal.toFixed(2) + ' лв.';
+  document.getElementById('finalTotal').textContent = finalTotal.toFixed(2) + ' лв.';
+  document.getElementById('finalTotalEUR').textContent = finalTotalEUR.toFixed(2) + ' €';
+}
 
 
     async function submitOrder() {
@@ -376,7 +390,6 @@ setTimeout(() => {
       }
       
       renderCart();
-  updateTotals();
       
       // Показване/скриване на полетата за парола
       document.getElementById('createAccount').addEventListener('change', function() {
@@ -389,27 +402,7 @@ setTimeout(() => {
 document.getElementById('termsCheckbox').addEventListener('change', function() {
   document.getElementById('orderBtn').disabled = !this.checked;
 });
-  
-function updateTotals() {
-  const productTotal = cartItems.reduce((sum, item) => sum + parseFloat(item.priceBGN || 0), 0);
-  const productTotalEUR = cartItems.reduce((sum, item) => sum + parseFloat(item.priceEUR || 0), 0);
-  const extraBGN = parseInt(document.getElementById('extraBGN')?.value || 0);
-  const extraSt = parseInt(document.getElementById('extraSt')?.value || 0);
-  const extraTotal = extraBGN + (extraSt / 100);
-  const finalTotal = productTotal + extraTotal;
-  const finalTotalEUR = productTotalEUR + (extraTotal / 1.95583);
-
-  document.getElementById('productTotal').textContent = productTotal.toFixed(2) + ' лв.';
-  document.getElementById('extraTotal').textContent = extraTotal.toFixed(2) + ' лв.';
-  document.getElementById('finalTotal').textContent = finalTotal.toFixed(2) + ' лв.';
-  document.getElementById('finalTotalEUR').textContent = finalTotalEUR.toFixed(2) + ' €';
-}
-
-
-document.getElementById('extraBGN')?.addEventListener('input', updateTotals);
-document.getElementById('extraSt')?.addEventListener('input', updateTotals);
-
-</script>
+  </script>
 
   <div id="confirmationMessage" class="confirmation-message hidden"></div>
 <footer class="site-footer">

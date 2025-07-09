@@ -1059,7 +1059,6 @@ a,
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
-  font-weight: bold;
   transition: background-color 0.3s ease;
 }
 
@@ -1194,7 +1193,7 @@ a {
 }
 
 .order-row input[type="checkbox"] {
-  accent-color: #F62616;
+  accent-color: #2ecc71;
   transform: scale(1.2);
   margin: 0;
 }
@@ -1502,7 +1501,6 @@ button.disabled,
   color: white;
   border: none;
   padding: 8px 16px;
-  font-weight: bold;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
