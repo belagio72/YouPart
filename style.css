@@ -1595,4 +1595,25 @@ button:disabled {
 .mobile-contact-info a:hover {
   text-decoration: underline;
 }
+.cart-link-msg {
+  font-weight: bold;
+  font-size: 17px;
+  text-decoration: underline;
+  color: #0645AD; /* син линк */
+}
+
+.cart-link-msg:hover {
+  color: #0A58CA;
+  text-decoration: none;
+  cursor: pointer;
+}
+@media (max-width: 768px) {
+  .btn.btn-primary {
+    display: block;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 300px;
+    text-align: center;
+  }
+}
 

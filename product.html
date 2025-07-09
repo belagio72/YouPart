@@ -98,9 +98,10 @@
   </div>
 </div>
 
-
-      <p class="success-message" id="successMsg">✅ Продуктът беше добавен в количката.</p>
-      
+      <p class="success-message" id="successMsg">
+        ✅ Продуктът беше добавен в 
+        <a href="cart.html" style="color: #065F46; text-decoration: underline; font-size: 1.2em;">количката</a>.
+      </p>
       <a id="ebayLink" href="#" target="_blank" class="btn btn-secondary" style="display: none;">
         Виж в eBay
       </a>
@@ -164,7 +165,7 @@
             ebayLink: data.ebayLink,
             image: data.images && data.images.length > 0 ? data.images[0] : ''
           };
-
+          
           let cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
           cartItems.push(product);
           localStorage.setItem('cartItems', JSON.stringify(cartItems));
@@ -185,7 +186,7 @@
     function setupLightbox() {
       let currentImageIndex = 0;
       let imageUrls = [];
-
+      
       document.getElementById('product-images').addEventListener('click', function(e) {
         if (e.target.tagName === 'IMG') {
           imageUrls = Array.from(document.querySelectorAll('#product-images img')).map(img => img.src);
@@ -276,6 +277,19 @@
     © 2025 YouPart.net – Всички права запазени.
   </div>
 </footer>
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6843676fa62149190d374066/1it3ko39c';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
 
   
 </body>
