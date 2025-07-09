@@ -167,6 +167,7 @@
       cartItems.splice(index, 1);
       localStorage.setItem('cartItems', JSON.stringify(cartItems));
       renderCart();
+  updateTotals();
       updateCartCount();
     }
 
@@ -375,6 +376,7 @@ setTimeout(() => {
       }
       
       renderCart();
+  updateTotals();
       
       // Показване/скриване на полетата за парола
       document.getElementById('createAccount').addEventListener('change', function() {
@@ -387,7 +389,27 @@ setTimeout(() => {
 document.getElementById('termsCheckbox').addEventListener('change', function() {
   document.getElementById('orderBtn').disabled = !this.checked;
 });
-  </script>
+  
+function updateTotals() {
+  const productTotal = cartItems.reduce((sum, item) => sum + parseFloat(item.priceBGN || 0), 0);
+  const productTotalEUR = cartItems.reduce((sum, item) => sum + parseFloat(item.priceEUR || 0), 0);
+  const extraBGN = parseInt(document.getElementById('extraBGN')?.value || 0);
+  const extraSt = parseInt(document.getElementById('extraSt')?.value || 0);
+  const extraTotal = extraBGN + (extraSt / 100);
+  const finalTotal = productTotal + extraTotal;
+  const finalTotalEUR = productTotalEUR + (extraTotal / 1.95583);
+
+  document.getElementById('productTotal').textContent = productTotal.toFixed(2) + ' лв.';
+  document.getElementById('extraTotal').textContent = extraTotal.toFixed(2) + ' лв.';
+  document.getElementById('finalTotal').textContent = finalTotal.toFixed(2) + ' лв.';
+  document.getElementById('finalTotalEUR').textContent = finalTotalEUR.toFixed(2) + ' €';
+}
+
+
+document.getElementById('extraBGN')?.addEventListener('input', updateTotals);
+document.getElementById('extraSt')?.addEventListener('input', updateTotals);
+
+</script>
 
   <div id="confirmationMessage" class="confirmation-message hidden"></div>
 <footer class="site-footer">
@@ -406,19 +428,6 @@ document.getElementById('termsCheckbox').addEventListener('change', function() {
     © 2025 YouPart.net – Всички права запазени.
   </div>
 </footer>
-<!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6843676fa62149190d374066/1it3ko39c';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
 
 </body>
 </html>
