@@ -1645,4 +1645,21 @@ img#visaLogo {
 #payBtn.btn-primary:hover {
   background-color: #218838;
 }
+.delivery-option {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.delivery-option input[type="checkbox"] {
+  margin: 0;
+  width: auto;
+}
+
+.delivery-option label {
+  margin: 0;
+  white-space: nowrap;
+}
 

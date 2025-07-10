@@ -138,9 +138,32 @@
           <input type="tel" id="phone" placeholder="Телефонен номер" required>
         </div>
         <div class="form-group">
-          <label for="address">Адрес</label>
-          <input type="text" id="address" placeholder="град, п.к., улица, №, допълнително" required>
-        </div>
+          
+      
+<div class="form-group">
+  <label for="officeSelect">Избери офис на Еконт (по избор)</label>
+  <select id="officeSelect">
+    <option value="">-- Избери офис --</option>
+  </select>
+</div>
+
+<div class="form-group">
+  <div class="delivery-option">
+    <input type="checkbox" id="wantAddress">
+    <label for="wantAddress">Желая доставка до адрес</label>
+  </div>
+</div>
+
+
+<div class="form-group" id="address-group" style="display: none;">
+  <label for="address">Адрес</label>
+  <input type="text" id="address" placeholder="град, п.к., улица, №, допълнително">
+</div>
+
+
+      
+
+
         <div class="form-group">
           <label><input type="checkbox" id="createAccount"> Създай акаунт</label>
           <input type="password" id="password1" placeholder="Парола" style="display: none;">
@@ -150,7 +173,7 @@
       </form>
       
       <p class="pay-row">
-        <button id="payBtn" class="btn btn-primary" onclick="startCheckout()" style="display: none;">Плати</button>
+        <button id="payBtn" class="btn btn-primary" type="button" onclick="startCheckout()" style="display: none;">Плати</button>
         <img id="visaLogo" src="visa-logo.png" alt="Картови методи Stripe" style="display: none;">
       </p>
 
@@ -427,6 +450,80 @@ document.getElementById('termsCheckbox').addEventListener('change', function() {
     © 2025 YouPart.net – Всички права запазени.
   </div>
 </footer>
+
+<script>
+async function loadEcontOffices() {
+  try {
+    const res = await fetch('econt_offices.json'); // Файлът трябва да е в същата папка
+    const offices = await res.json();
+    const select = document.getElementById('officeSelect');
+
+    offices.forEach(office => {
+      const option = document.createElement('option');
+      option.value = `${office.name} - ${office.address}`;
+      option.textContent = `${office.name} – ${office.address}`;
+      select.appendChild(option);
+    });
+
+    // Попълване на адреса автоматично
+    select.addEventListener('change', () => {
+      if (select.value) {
+        document.getElementById('address').value = select.value;
+      }
+    });
+  } catch (err) {
+    console.error("⚠️ Грешка при зареждане на офисите:", err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadEcontOffices);
+</script>
+<script>
+  const wantAddressCheckbox = document.getElementById('wantAddress');
+  const addressGroup = document.getElementById('addressGroup');
+
+  wantAddressCheckbox.addEventListener('change', () => {
+    if (wantAddressCheckbox.checked) {
+      addressGroup.style.display = 'block';
+    } else {
+      addressGroup.style.display = 'none';
+      document.getElementById('address').value = ''; // изчистване на полето при отказ
+    }
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const officeSelect = document.getElementById('officeSelect');
+    const wantAddressCheckbox = document.getElementById('wantAddress');
+    const addressGroup = document.getElementById('address-group');
+
+function toggleAddressField() {
+  if (wantAddressCheckbox.checked) {
+    // Скрий офис менюто и го деактивирай
+    officeSelect.value = '';
+    officeSelect.disabled = true;
+
+    // Изчисти полето за адрес преди показване
+    document.getElementById('address').value = '';
+
+    addressGroup.style.display = 'block';
+  } else {
+    // Активирай офис менюто и скрий адреса
+    officeSelect.disabled = false;
+    addressGroup.style.display = 'none';
+  }
+}
+
+
+    wantAddressCheckbox.addEventListener('change', toggleAddressField);
+
+    // Стартирай с правилна видимост
+    toggleAddressField();
+  });
+</script>
+
+
+
 
 </body>
 </html>
