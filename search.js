@@ -1,3 +1,23 @@
+let userInitiatedSearch = false;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const searchBtn = document.getElementById("searchBtn");
+  if (searchBtn) {
+    searchBtn.addEventListener("click", () => {
+      userInitiatedSearch = true;
+    });
+  }
+  
+  // Нулиране при клик на бутон "Начало"
+  document.querySelectorAll('.uiverse-btn').forEach(button => {
+    if (button.textContent.includes('Начало')) {
+      button.addEventListener('click', () => {
+        userInitiatedSearch = false;
+      });
+    }
+  });
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   (async () => {
     // DOM елементи
@@ -16,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentQuery = '';
     let currentRegion = 'europe';
     let totalPages = 0;
+    let manualSearch = false;
     const itemsPerPage = 20;
 
     // Зареждане на данни за автомобили
@@ -133,8 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!data.results || data.results.length === 0) {
           resultsDiv.innerHTML = 'Няма намерени резултати. Разшири търсенето като избереш Нови, Употребявани, в Европа или Глобално';
-          // Скролване до съобщението за липса на резултати на мобилни устройства
-          if (window.innerWidth <= 768) {
+          // Скролване само при потребителско търсене
+          if (userInitiatedSearch && window.innerWidth <= 768) {
             setTimeout(() => {
               resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 100);
@@ -148,20 +169,21 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPagination(totalItems);
         updateUrlWithSearchParams();
 
-        // Скролване до първия резултат на мобилни устройства
-        if (window.innerWidth <= 768) {
+        // Скролване само при потребителско търсене
+        if (userInitiatedSearch && window.innerWidth <= 768) {
           setTimeout(() => {
             const firstResult = document.querySelector('.item-link');
             if (firstResult) {
               firstResult.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
-          }, 100);
+            userInitiatedSearch = false; // Нулиране след скрол
+          }, 200);
         }
       } catch (err) {
         console.error('⚠️ Грешка при търсене:', err);
         resultsDiv.innerHTML = 'Грешка при търсене!';
-        // Скролване до съобщението за грешка на мобилни устройства
-        if (window.innerWidth <= 768) {
+        // Скролване само при потребителско търсене
+        if (userInitiatedSearch && window.innerWidth <= 768) {
           setTimeout(() => {
             resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }, 100);
@@ -182,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
           
           const bgCategoryName = category.bg.split(' - ')[0];
           const summary = document.createElement('summary');
-          summary.className = 'category-title'; // 👉 добавяме нужния клас
+          summary.className = 'category-title';
           summary.textContent = bgCategoryName;
           details.appendChild(summary);
 
@@ -192,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
           category.children.forEach(subCategory => {
             const button = document.createElement('button');
             button.textContent = subCategory.bg.replace(/^- /, '');
-            button.className = 'subcategory'; // 👈 Добавяме клас subcategory
+            button.className = 'subcategory';
             button.onclick = () => {
               partInput.value = subCategory.en;
               searchBtn.click();
@@ -253,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
       items.forEach(item => {
         const link = document.createElement('a');
         link.className = 'item-link';
-        console.log('➡️ Предавано заглавие към product.html:', item.title);
         link.href = `product.html?id=${encodeURIComponent(item.itemId)}&title=${encodeURIComponent(item.title)}&priceBGN=${encodeURIComponent(item.priceBGN)}&query=${encodeURIComponent(currentQuery)}&region=${currentRegion}`;
     
         const div = document.createElement('div');

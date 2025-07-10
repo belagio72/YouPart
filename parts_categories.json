@@ -1605,11 +1605,11 @@
       },
       {
         "bg": "Стоп",
-        "en": "Brake light"
+        "en": "Tail light"
       },
       {
         "bg": "Допълнителен трети стоп",
-        "en": "Third brake light"
+        "en": "High Level Brake Light"
       },
       {
         "bg": "Мигач в огледалото",
@@ -2061,7 +2061,7 @@
       },
       {
         "bg": "Капак върху двигателя",
-        "en": "Bonnet"
+        "en": "Hood Bonnet"
       },
       {
         "bg": "Пета врата",
