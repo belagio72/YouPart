@@ -165,13 +165,12 @@ header {
 }
 
 .mobile-header-bottom {
-  position: relative;
-  z-index: 1;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding-top: 10px;
+  justify-content: space-between;
+  padding: 0 12px; /* Добавя малко отстояние от ляво и дясно */
 }
+
 
 .mobile-header-bottom img {
   height: 50px;
