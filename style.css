@@ -1298,7 +1298,20 @@ a {
     width: 100%;
     align-items: flex-start;
   }
- 
+ @media (max-width: 768px) {
+  .cart-bottom-bar .order-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .cart-bottom-bar .order-row button,
+  .cart-bottom-bar .order-row input[type="checkbox"],
+  .cart-bottom-bar .order-row label {
+    margin: 5px 0;
+  }
+}
+
   
 }
 .confirmation-message {
