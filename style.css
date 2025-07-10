@@ -1285,35 +1285,35 @@ a {
 /* 📱 За мобилни: вертикално подреждане */
 @media (max-width: 768px) {
   .cart-bottom-bar {
-    flex-direction: column-reverse; /* 🔄 ОБРЪЩАМЕ РЕДА НА МОБИЛНИ */
-    align-items: flex-start;
-  }
-
-  .order-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     flex-direction: column;
-    align-items: flex-start;
+    text-align: center;
+    padding: 10px 0;
   }
 
-  .extra-charge-section {
-    width: 100%;
-    align-items: flex-start;
-  }
- @media (max-width: 768px) {
   .cart-bottom-bar .order-row {
+    display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
+    gap: 12px;
   }
 
-  .cart-bottom-bar .order-row button,
-  .cart-bottom-bar .order-row input[type="checkbox"],
   .cart-bottom-bar .order-row label {
-    margin: 5px 0;
+    max-width: 90%;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .cart-bottom-bar .order-row a {
+    display: inline-block;
   }
 }
 
-  
-}
+
+
+
 .confirmation-message {
   position: fixed;
   bottom: 20px;
@@ -1487,7 +1487,7 @@ button.disabled,
     width: 100%;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   /* Останалите стилове остават същите */
