@@ -11,7 +11,16 @@ const telegramChatId = '7367702928';
 const endpointSecret = 'whsec_438c8a2914506ac227f6c787caeeb2948f8be00345b61c0fcb892e78e6f45222';
 const settingsPath = path.join(__dirname, 'settings.json');
 const nodemailer = require('nodemailer');
+const translationsPath = path.join(__dirname, 'translations.json');
 
+// Зареждане на кеша с преводи
+let translations = {};
+try {
+  translations = JSON.parse(fs.readFileSync(translationsPath, 'utf-8'));
+} catch (err) {
+  console.warn('⚠️ Неуспешно зареждане на translations.json, започваме с празен обект');
+  translations = {};
+}
 // Конфигурация за Zoho Mail
 const transporter = nodemailer.createTransport({
   host: "smtp.zoho.eu",
@@ -345,6 +354,31 @@ async function detectLanguage(text) {
   }
 }
 
+
+const translationCachePath = path.join(__dirname, 'translation_cache.json');
+let translationCache = {};
+try {
+  if (fs.existsSync(translationCachePath)) {
+    translationCache = JSON.parse(fs.readFileSync(translationCachePath, 'utf-8'));
+  }
+} catch (e) {
+  console.error("⚠️ Грешка при зареждане на translation_cache.json:", e);
+}
+
+// 🧠 Кеширащ превод
+async function cachedTranslate(text, sourceLang, targetLang) {
+  const cacheKey = `${text}-${sourceLang}-${targetLang}`;
+
+  if (translationCache[cacheKey]) {
+    return translationCache[cacheKey];
+  }
+
+  const translated = await translateText(text, sourceLang, targetLang); // 👈 Тук трябва да се вика translateText, не cachedTranslate
+  translationCache[cacheKey] = translated;
+  return translated;
+}
+
+
 async function translateText(text, from, to) {
   try {
     const response = await axios.post('https://translation.googleapis.com/language/translate/v2', null, {
@@ -372,7 +406,7 @@ app.get('/search', async (req, res) => {
 
   try {
     const lang = await detectLanguage(query);
-    const translatedQuery = lang === 'bg' ? await translateText(query, 'bg', 'en') : query;
+    const translatedQuery = lang === 'bg' ? await cachedTranslate(query, 'bg', 'en') : query;
 
     const tokenRes = await axios.post(
       'https://api.ebay.com/identity/v1/oauth2/token',
@@ -451,7 +485,18 @@ app.get('/search', async (req, res) => {
           priceEUR = (totalPrice * gbpToEUR * markup).toFixed(2);
         }
 
-        let translatedTitle = await translateText(item.title, 'en', 'bg');
+let translatedTitle;
+
+if (translations[item.title]) {
+  translatedTitle = translations[item.title];
+} else {
+  translatedTitle = await cachedTranslate(item.title, 'en', 'bg');
+  translations[item.title] = translatedTitle;
+
+  // Записваме кеша
+  fs.writeFileSync(translationsPath, JSON.stringify(translations, null, 2));
+}
+
 
         return {
           itemId: item.itemId,
