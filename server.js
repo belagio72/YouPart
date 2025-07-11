@@ -12,6 +12,20 @@ const endpointSecret = 'whsec_438c8a2914506ac227f6c787caeeb2948f8be00345b61c0fcb
 const settingsPath = path.join(__dirname, 'settings.json');
 const nodemailer = require('nodemailer');
 const translationsPath = path.join(__dirname, 'translations.json');
+const counterPath = path.join(__dirname, 'orderCounter.json');
+
+function getNextOrderNumber() {
+  try {
+    const data = fs.readFileSync(counterPath, 'utf-8');
+    const json = JSON.parse(data);
+    json.lastOrderNumber += 1;
+    fs.writeFileSync(counterPath, JSON.stringify(json, null, 2));
+    return json.lastOrderNumber;
+  } catch (err) {
+    console.error('⚠️ Грешка при четене на orderCounter.json:', err);
+    return Date.now(); // fallback уникално число
+  }
+}
 
 // Зареждане на кеша с преводи
 let translations = {};
@@ -287,10 +301,17 @@ app.post('/order', async (req, res) => {
   console.log('📥 Получена заявка за поръчка');
   console.log('➡️ Данни от клиента:', req.body);
 
-  const order = req.body;
+  const order = {
+  ...req.body,
+  orderNumber: getNextOrderNumber(),
+  createdAt: new Date().toISOString(),
+  paid: false,
+  archived: false
+};
+
 
   const message = `
-🛒 НОВА ПОРЪЧКА:
+🛒 НОВА ПОРЪЧКА #${order.orderNumber}:
 👤 Име: ${order.name}
 📧 Имейл: ${order.email}
 📞 Телефон: ${order.phone}
@@ -319,23 +340,19 @@ app.post('/order', async (req, res) => {
       orders = raw.trim() ? JSON.parse(raw) : [];
     }
 
-    const lastOrder = orders.length > 0 ? orders[orders.length - 1] : null;
-    const lastNum = lastOrder?.orderNumber?.replace('ORD-', '') ?? '0';
-    const nextNum = String(Number(lastNum) + 1).padStart(4, '0');
-    const newOrderNumber = 'ORD-' + nextNum;
+const newOrder = {
+  ...order,
+  date: new Date().toISOString()
+};
 
-    const newOrder = {
-      ...order,
-      orderNumber: newOrderNumber,
-      date: new Date().toISOString()
-    };
 
-    orders.push(newOrder);
+    orders.push(order); // order вече съдържа orderNumber
     fs.writeFileSync(ordersPath, JSON.stringify(orders, null, 2));
-    console.log('📦 Записана поръчка:', newOrder);
-    await sendConfirmationEmail(newOrder);
+    console.log('📦 Записана поръчка:', order);
+    await sendConfirmationEmail(order);
 
-    res.json({ success: true, orderNumber: newOrderNumber });
+    res.json({ success: true, orderNumber: order.orderNumber });
+
   } catch (err) {
     console.error('❌ Грешка при запис в orders.json:', err);
     res.status(500).json({ success: false });
