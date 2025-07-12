@@ -249,7 +249,10 @@ async function updateNote(orderNumber, note) {
     const res = await fetch('/admin/update-note', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderNumber, note })
+      body: JSON.stringify({ 
+        orderNumber: Number(orderNumber), // Ключова промяна - изпращаме като число
+        note 
+      })
     });
     const result = await res.json();
     if (!result.success) {
@@ -267,7 +270,9 @@ async function archiveOrder(orderNumber) {
     const res = await fetch('/admin/archive', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderNumber })
+      body: JSON.stringify({ 
+        orderNumber: Number(orderNumber) // Ключова промяна - изпращаме като число
+      })
     });
     
     const result = await res.json();

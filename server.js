@@ -185,23 +185,45 @@ app.post('/api/settings', (req, res) => {
   }
 });
 
+// Ключови промени за обработка на бележките
+function readOrders() {
+  try {
+    const raw = fs.readFileSync(ordersPath, 'utf-8');
+    return raw.trim() ? JSON.parse(raw) : [];
+  } catch (err) {
+    console.error('❌ Грешка при четене на orders.json:', err);
+    return [];
+  }
+}
+
 app.post('/admin/update-note', (req, res) => {
   const { orderNumber, note } = req.body;
-
+  
   try {
-    const orders = JSON.parse(fs.readFileSync(ordersPath, 'utf-8'));
+    const orders = readOrders();
+    let orderFound = false;
+    
     const updatedOrders = orders.map(order => {
-      if (order.orderNumber === orderNumber) {
+      // Сравняваме като числа
+      if (Number(order.orderNumber) === Number(orderNumber)) {
+        orderFound = true;
         return { ...order, note };
       }
       return order;
     });
 
+    if (!orderFound) {
+      return res.status(404).json({ 
+        success: false, 
+        error: `Поръчка #${orderNumber} не е намерена` 
+      });
+    }
+
     fs.writeFileSync(ordersPath, JSON.stringify(updatedOrders, null, 2));
     res.json({ success: true });
   } catch (err) {
     console.error('❌ Грешка при запис на бележка:', err);
-    res.status(500).json({ success: false });
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
@@ -209,11 +231,16 @@ app.post('/admin/archive', (req, res) => {
   const { orderNumber } = req.body;
 
   try {
-    const orders = JSON.parse(fs.readFileSync(ordersPath, 'utf-8'));
-    const archive = fs.existsSync(path.join(__dirname, 'archive.json')) ? 
-      JSON.parse(fs.readFileSync(path.join(__dirname, 'archive.json'), 'utf-8')) : [];
+    const orders = readOrders();
+    const archive = fs.existsSync(path.join(__dirname, 'archive.json')) 
+      ? JSON.parse(fs.readFileSync(path.join(__dirname, 'archive.json'), 'utf-8'))
+      : [];
     
-    const orderToArchive = orders.find(order => order.orderNumber === orderNumber);
+    // Сравняваме като числа
+    const orderToArchive = orders.find(order => 
+      Number(order.orderNumber) === Number(orderNumber)
+    );
+    
     if (!orderToArchive) {
       return res.status(404).json({ success: false, error: 'Поръчката не е намерена' });
     }
@@ -221,7 +248,9 @@ app.post('/admin/archive', (req, res) => {
     archive.push(orderToArchive);
     fs.writeFileSync(path.join(__dirname, 'archive.json'), JSON.stringify(archive, null, 2));
 
-    const updatedOrders = orders.filter(order => order.orderNumber !== orderNumber);
+    const updatedOrders = orders.filter(order => 
+      Number(order.orderNumber) !== Number(orderNumber)
+    );
     fs.writeFileSync(ordersPath, JSON.stringify(updatedOrders, null, 2));
 
     res.json({ success: true });
@@ -302,13 +331,12 @@ app.post('/order', async (req, res) => {
   console.log('➡️ Данни от клиента:', req.body);
 
   const order = {
-  ...req.body,
-  orderNumber: getNextOrderNumber(),
-  createdAt: new Date().toISOString(),
-  paid: false,
-  archived: false
-};
-
+    ...req.body,
+    orderNumber: getNextOrderNumber(),
+    createdAt: new Date().toISOString(),
+    paid: false,
+    archived: false
+  };
 
   const message = `
 🛒 НОВА ПОРЪЧКА #${order.orderNumber}:
@@ -332,21 +360,14 @@ app.post('/order', async (req, res) => {
   }
 
   try {
-    const ordersPath = path.join(__dirname, 'orders.json');
+    let orders = readOrders();
 
-    let orders = [];
-    if (fs.existsSync(ordersPath)) {
-      const raw = fs.readFileSync(ordersPath, 'utf-8');
-      orders = raw.trim() ? JSON.parse(raw) : [];
-    }
+    const newOrder = {
+      ...order,
+      date: new Date().toISOString()
+    };
 
-const newOrder = {
-  ...order,
-  date: new Date().toISOString()
-};
-
-
-    orders.push(order); // order вече съдържа orderNumber
+    orders.push(newOrder);
     fs.writeFileSync(ordersPath, JSON.stringify(orders, null, 2));
     console.log('📦 Записана поръчка:', order);
     await sendConfirmationEmail(order);
@@ -684,8 +705,7 @@ app.get('/admin/archived-orders', (req, res) => {
 
 app.get('/admin/orders', (req, res) => {
   try {
-    const data = fs.readFileSync(ordersPath, 'utf-8');
-    const orders = JSON.parse(data);
+    const orders = readOrders();
     res.json({ orders });
   } catch (err) {
     console.error('❌ Грешка при четене на поръчките:', err);
@@ -805,21 +825,16 @@ if (event.type === 'checkout.session.completed') {
   console.log('✅ Успешно плащане за поръчка:', orderNumber);
 
   if (orderNumber) {
-    const ordersPath = path.join(__dirname, 'orders.json');
-    try {
-      const orders = JSON.parse(fs.readFileSync(ordersPath, 'utf-8'));
-      const updatedOrders = orders.map(order => {
-        if (order.orderNumber === orderNumber) {
-          return { ...order, paymentStatus: 'платена' };
-        }
-        return order;
-      });
+    const orders = readOrders();
+    const updatedOrders = orders.map(order => {
+      if (Number(order.orderNumber) === Number(orderNumber)) {
+        return { ...order, paymentStatus: 'платена' };
+      }
+      return order;
+    });
 
-      fs.writeFileSync(ordersPath, JSON.stringify(updatedOrders, null, 2));
-      console.log(`💾 Поръчка ${orderNumber} е отбелязана като платена.`);
-    } catch (err) {
-      console.error('❌ Грешка при обновяване на orders.json:', err);
-    }
+    fs.writeFileSync(ordersPath, JSON.stringify(updatedOrders, null, 2));
+    console.log(`💾 Поръчка ${orderNumber} е отбелязана като платена.`);
   }
 }
 
