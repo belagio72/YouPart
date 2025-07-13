@@ -2182,6 +2182,10 @@
         "en": "Window regulator"
       },
       {
+        "bg": "Щора за багажник",
+        "en": "Cargo cover"
+      },
+      {
         "bg": "Дръжки",
         "en": "Handles"
       },
@@ -2189,6 +2193,7 @@
         "bg": "Дръжка за врата",
         "en": "Door handle"
       }
+      
     ]
   }
 ]
