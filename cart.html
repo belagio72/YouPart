@@ -227,11 +227,7 @@
         cartDiv.appendChild(div);
       });
 
-      // Възстановяване на запазени данни при зареждане
-      const savedEmail = localStorage.getItem('customerEmail');
-      if (savedEmail) {
-        document.getElementById('email').value = savedEmail;
-      }
+      
 
       // Запазване на имейла при промяна
       document.getElementById('email').addEventListener('change', (e) => {
