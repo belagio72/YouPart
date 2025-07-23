@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /admin.html
+Disallow: /belagio72.html
+Sitemap: https://youpart.net/sitemap.xml
