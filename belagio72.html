@@ -54,7 +54,6 @@
   <h1>Админ панел</h1>
   <button onclick="logout()" style="float:right;">Изход</button>
 
-  <!-- eBay секцията е преместена тук, за да се показва само когато потребителят е логнат -->
   <div id="ebay-section" style="margin-top: 20px; padding: 15px; background: #f8f8f8; border-radius: 12px; border: 1px solid #ccc;">
     <h3>🎯 Създай линк към продукт от eBay</h3>
     <input type="text" id="ebayInput" placeholder="Постави eBay линк тук" style="width: 50%; padding: 8px;">
@@ -212,7 +211,18 @@ async function fetchOrders() {
       <div class="order-item">
         <p><strong>Продукт:</strong> ${item.title || '—'}</p>
         <p><strong>Цена:</strong> ${item.priceBGN || '—'} лв. (${item.priceEUR || '—'} €)</p>
-        <p><strong>Линк:</strong> <a href="${item.ebayLink}" target="_blank">${item.ebayLink || '—'}</a></p>
+        <p><strong>eBay линк:</strong> <a href="${item.ebayLink}" target="_blank">${item.ebayLink || '—'}</a></p>
+        ${item.productLink ? `<p><strong>Линк в сайта:</strong> <a href="${item.productLink}" target="_blank">${item.productLink}</a></p>` : ''}
+        
+        <!-- КОРИГИРАН ЛИНК С ДОБАВЕН ПАРАМЕТЪР ЗА ЦЕНАТА -->
+        ${item.itemId ? `
+          <p><strong>Линк в нашия сайт:</strong> 
+            <a href="/product.html?id=${item.itemId}&priceBGN=${item.priceBGN}" target="_blank">
+              /product.html?id=${item.itemId}&priceBGN=${item.priceBGN}
+            </a>
+          </p>
+        ` : ''}
+        
         ${item.image ? `<img src="${item.image}" alt="Product Image" style="max-width:100px;">` : ''}
       </div>
     `).join('');
@@ -250,7 +260,7 @@ async function updateNote(orderNumber, note) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
-        orderNumber: Number(orderNumber), // Ключова промяна - изпращаме като число
+        orderNumber: Number(orderNumber),
         note 
       })
     });
@@ -271,7 +281,7 @@ async function archiveOrder(orderNumber) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
-        orderNumber: Number(orderNumber) // Ключова промяна - изпращаме като число
+        orderNumber: Number(orderNumber)
       })
     });
     
@@ -347,7 +357,18 @@ async function fetchArchive() {
         <div class="order-item">
           <p><strong>Продукт:</strong> ${item.title || '—'}</p>
           <p><strong>Цена:</strong> ${item.priceBGN || '—'} лв.</p>
-          <p><strong>Линк:</strong> <a href="${item.ebayLink || '#'}" target="_blank">${item.ebayLink || '—'}</a></p>
+          <p><strong>eBay линк:</strong> <a href="${item.ebayLink || '#'}" target="_blank">${item.ebayLink || '—'}</a></p>
+          ${item.productLink ? `<p><strong>Линк в сайта:</strong> <a href="${item.productLink}" target="_blank">${item.productLink}</a></p>` : ''}
+          
+          <!-- КОРИГИРАН ЛИНК С ДОБАВЕН ПАРАМЕТЪР ЗА ЦЕНАТА -->
+          ${item.itemId ? `
+            <p><strong>Линк в нашия сайт:</strong> 
+              <a href="/product.html?id=${item.itemId}&priceBGN=${item.priceBGN}" target="_blank">
+                /product.html?id=${item.itemId}&priceBGN=${item.priceBGN}
+              </a>
+            </p>
+          ` : ''}
+          
           ${item.image ? `<img src="${item.image}" style="max-width:100px;">` : ''}
         </div>
       `).join('');
@@ -425,10 +446,8 @@ function copyToClipboard(text) {
 }
 </script>
 
-
 </body>
 </html>
-
 
 
 
