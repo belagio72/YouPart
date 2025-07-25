@@ -81,8 +81,11 @@
 <div class="product-info">
   <div class="price-section">
     <p><strong>Цена:</strong></p>
-    <p class="price-main" id="price">—</p>
-    <p class="price-secondary" id="priceEUR"></p>
+    <div class="dual-price" id="price-block">
+      <span id="price">—</span>
+      <span id="priceEUR"></span>
+    </div>
+
   </div>
   
   <div class="product-description" id="description"></div>
@@ -135,10 +138,11 @@
         const displayTitle = title || data.title || 'Продукт';
         document.getElementById('title').textContent = displayTitle;
 
-        document.getElementById('price').textContent = `${data.price} ${data.currency}`;
+        document.getElementById('price').textContent = `${data.price} лв.`;
         if (data.priceEUR) {
-          document.getElementById('priceEUR').textContent = `(${data.priceEUR} €)`;
+          document.getElementById('priceEUR').textContent = `${data.priceEUR} €`;
         }
+
 
         if (data.description) {
           document.getElementById('description').textContent = data.description;

@@ -217,9 +217,14 @@
         div.innerHTML = `
           <img src="${item.image}" alt="${item.title}">
           <!-- Промяна в cart.html -->
+          
 <div class="cart-item-details">
   <h3 class="cart-item-title">${item.title}</h3>
-  <p class="cart-item-price">${item.priceBGN} лв. <span class="price-secondary">(${item.priceEUR} €)</span></p>
+  <div class="cart-item-price dual-price">
+  <span>${item.priceBGN} лв.</span>
+  <span>(${item.priceEUR} €)</span>
+</div>
+
   
   <div class="cart-item-actions">
     <button class="btn btn-secondary" onclick="removeItem(${index})">🗑 Премахни</button>

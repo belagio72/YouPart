@@ -1662,4 +1662,15 @@ img#visaLogo {
   margin: 0;
   white-space: nowrap;
 }
+.dual-price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333; /* Единен цвят */
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.dual-price span {
+  white-space: nowrap;
+}
 

@@ -282,7 +282,11 @@ document.addEventListener('DOMContentLoaded', () => {
         div.innerHTML = `
           <img src="${item.image}" alt="${item.title}">
           <h3>${item.title}</h3>
-          <p>Цена: ${item.priceBGN} лв. (${item.priceEUR} €)</p>
+          <p class="dual-price">
+            <span>${item.priceBGN} лв.</span>
+            <span>${item.priceEUR} €</span>
+          </p>
+
         `;
 
         link.appendChild(div);
