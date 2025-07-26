@@ -1,0 +1,10 @@
+# Игнориране на node зависимости
+node_modules/
+package-lock.json
+
+# Временни снимки
+fb-prepared/
+temp-img-*.jpg
+
+# Скриптове и логове
+*.log
