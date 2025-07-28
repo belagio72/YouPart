@@ -52,6 +52,20 @@ const TELEGRAM_CHAT_ID = '7367702928';
 const TELEGRAM_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
 const app = express();
+
+app.get('/sitemap.xml', (req, res) => {
+  res.header('Content-Type', 'application/xml');
+  res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://youpart.net/</loc></url>
+  <url><loc>https://youpart.net/product.html</loc></url>
+  <url><loc>https://youpart.net/cart.html</loc></url>
+  <url><loc>https://youpart.net/how-it-works.html</loc></url>
+  <url><loc>https://youpart.net/delivery-returns.html</loc></url>
+  <url><loc>https://youpart.net/legal.html</loc></url>
+</urlset>`);
+});
+
 const { registerUser, loginUser } = require('./auth');
 app.use(express.json());
 app.post('/api/register', registerUser);
@@ -456,21 +470,6 @@ app.get('/search', async (req, res) => {
         },
       }
     );
-
-app.get('/sitemap.xml', (req, res) => {
-  res.header('Content-Type', 'application/xml');
-  res.send(`<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://youpart.net/</loc></url>
-  <url><loc>https://youpart.net/product.html</loc></url>
-  <url><loc>https://youpart.net/cart.html</loc></url>
-  <url><loc>https://youpart.net/how-it-works.html</loc></url>
-  <url><loc>https://youpart.net/delivery-returns.html</loc></url>
-  <url><loc>https://youpart.net/legal.html</loc></url>
-</urlset>`);
-});
-
-
 
     const filters = {};
     if (condition === 'used') {
