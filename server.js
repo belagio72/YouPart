@@ -811,6 +811,7 @@ app.post('/create-checkout-session', checkoutLimiter, async (req, res) => {
         }
       ],
       mode: 'payment',
+      client_reference_id: orderNumber,
       success_url: `${DOMAIN}/success.html`,
       cancel_url: `${DOMAIN}/cancel.html`,
       // Добавете метаданни за orderNumber
