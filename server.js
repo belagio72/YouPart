@@ -13,6 +13,12 @@ const settingsPath = path.join(__dirname, 'settings.json');
 const nodemailer = require('nodemailer');
 const translationsPath = path.join(__dirname, 'translations.json');
 const counterPath = path.join(__dirname, 'orderCounter.json');
+const rateLimit = require('express-rate-limit');
+const checkoutLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 минута
+  max: 5,              // до 5 заявки на минута на IP
+  message: '🚫 Прекалено много опити за плащане. Моля, опитайте отново след малко.'
+});
 
 function getNextOrderNumber() {
   try {
@@ -773,7 +779,7 @@ app.post('/api/reply', (req, res) => {
   }
 });
 
-app.post('/create-checkout-session', async (req, res) => {
+app.post('/create-checkout-session', checkoutLimiter, async (req, res) => {
   try {
     const { items, orderNumber, extraCharge = 0 } = req.body;
 
