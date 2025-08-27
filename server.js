@@ -121,6 +121,8 @@ app.use((req, res, next) => {
   }
 });
 
+
+
 app.use('/webhook', express.raw({ type: 'application/json' }));
 app.use(express.static(__dirname));
 
@@ -358,15 +360,28 @@ app.post('/order', async (req, res) => {
     archived: false
   };
 
+  const messageItems = (order.items || []).map((item, index) => {
+  const youpartLink = item.itemId && item.priceBGN
+    ? `https://youpart.net/product.html?id=${item.itemId}&priceBGN=${item.priceBGN}`
+    : 'няма';
+
+  return `
+🔹 Продукт ${index + 1}:
+📦 ${item.title || 'неизвестен'}
+💰 ${item.priceBGN || '??'} лв. (${item.priceEUR || '??'} €)
+🔗 eBay: ${item.ebayLink || 'няма'}
+🔗 YouPart: ${youpartLink}`;
+}).join('\n');
+
+
+  // Телеграм съобщение
   const message = `
 🛒 НОВА ПОРЪЧКА #${order.orderNumber}:
 👤 Име: ${order.name}
 📧 Имейл: ${order.email}
 📞 Телефон: ${order.phone}
 🏠 Адрес: ${order.address}
-📦 Продукт: ${order.title}
-💰 Цена: ${order.priceBGN} лв. (${order.priceEUR} €)
-🔗 Линк: ${order.ebayLink}
+${messageItems}
 `;
 
   const telegramUrl = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
@@ -399,6 +414,7 @@ app.post('/order', async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
+
 
 async function detectLanguage(text) {
   try {
