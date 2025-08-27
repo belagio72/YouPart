@@ -11,4 +11,9 @@ temp-img-*.jpg
 
 # Чувствителни конфигурации
 .env
+archived_orders.json
+orderCounter.json
+orders.json
+translations.json
+settings.json
 
