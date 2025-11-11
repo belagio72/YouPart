@@ -15,22 +15,167 @@
   <section id="delivery-returns" class="info-section">
     <div class="info-container">
       <div class="info-header">
-        <h2>🧰 Доставка и връщане</h2> <!-- или 📦 Доставка и връщане -->
+        <h2>🧰 Доставка и връщане</h2>
         <button class="close-info-btn" onclick="history.back()">Затвори</button>
       </div>
       <hr>
-      <h2><b> 🚚 Доставка от Англия и Европа</b></h2>
+
+      <!-- === Секция: Доставка от САЩ (преместена най-отгоре) === -->
+      <h2><b>✈️ Доставка от САЩ</b></h2>
+
+      <div id="usa-shipping">
+        <p>Изчислете ориентировъчната цена за доставка от САЩ до България:</p>
+
+        <div class="calculator-box">
+          <label>Вид транспорт:</label>
+          <select id="type">
+            <option value="air">✈️ По въздух</option>
+            <option value="sea">🚢 По вода</option>
+          </select>
+
+          <label>Дължина (см):</label>
+          <input type="number" id="length" placeholder="напр. 60">
+
+          <label>Ширина (см):</label>
+          <input type="number" id="width" placeholder="напр. 40">
+
+          <label>Височина (см):</label>
+          <input type="number" id="height" placeholder="напр. 30">
+
+          <label>Тегло (кг):</label>
+          <input type="number" id="weight" placeholder="напр. 5">
+
+          <label>Декларирана стойност (USD):</label>
+          <input type="number" id="declared" placeholder="напр. 200">
+
+          <button id="calc" class="primary-btn">Виж цена на доставка</button>
+
+          <div class="result" id="result"></div>
+        </div>
+      </div>
+
+      <style>
+        #usa-shipping { background: #fff; padding: 15px; border-radius: 8px; margin-top: 15px; }
+        #usa-shipping label { display: block; margin-top: 6px; font-weight: 500; }
+        #usa-shipping input, #usa-shipping select {
+          width: 100%; padding: 6px; margin-bottom: 6px; border: 1px solid #ddd; border-radius: 4px;
+        }
+        #usa-shipping .primary-btn {
+          background: #1b6ec2; color: #fff; border: none; border-radius: 6px;
+          padding: 8px 14px; cursor: pointer; margin-top: 8px;
+        }
+        #usa-shipping .result { margin-top: 15px; background: #f9f9f9; padding: 10px; border-radius: 6px; }
+      </style>
+
+      <script>
+      function calcWater(m, w, v, y) {
+        var b = m / 2.54, S = w / 2.54, A = v / 2.54, I = b * S * A, P = m * w * v, E = I * 0.007;
+        if (E < 15) E = 15;
+        E *= 1.2;
+        var T = (100 / 2.54) ** 3, O = T * 0.007;
+        if (O < 15) O = 15;
+        O *= 1.2;
+        if (P > 1000000) { E *= 0.5; if (E < O) E = O; }
+
+        // ✳️ Добавяме markup 10%
+        E *= 1.10;
+
+        let M = y * 0.07; // 7% митническо обслужване
+        let x = y * 0.2;  // 20% ДДС
+        return { delivery: E, duty: M, vat: x, total: E + M + x };
+      }
+
+      function calcAir(m, w, v, y, b) {
+        let S = m * w * v, A = 0;
+        if (m <= 15 && w <= 15 && v <= 15) {
+          A = (m <= 10 && w <= 10 && v <= 10) ? 15 : 25;
+          let E = 4;
+          if (y > E) A += (y - E) * 6;
+        } else {
+          let E = [
+            { volume: 27000, cost: 63 },
+            { volume: 27900, cost: 63.7 },
+            { volume: 28800, cost: 64.63 },
+            { volume: 33728, cost: 69.72 },
+            { volume: 74088, cost: 111.43 }
+          ];
+          A = E[0].cost;
+          for (let O = 0; O < E.length - 1; O++) {
+            if (S <= E[O + 1].volume) {
+              let M = E[O].volume, x = E[O + 1].volume, _ = E[O].cost, $ = E[O + 1].cost;
+              A = _ + (S - M) * ($ - _) / (x - M);
+              break;
+            }
+          }
+          if (S > E[E.length - 1].volume) A += (S - E[E.length - 1].volume) * 0.001033;
+          let T = S * 1.63 / 10000;
+          if (y > T + 4) A += (y - T - 4) * 7;
+        }
+
+        // ✳️ Добавяме markup 10%
+        A *= 1.10;
+
+        let I = b * 0.07; // 7% митническо обслужване
+        let P = b * 0.2;  // 20% ДДС
+        return { delivery: A, duty: I, vat: P, total: A + I + P };
+      }
+
+      document.getElementById('calc').addEventListener('click', function() {
+        const type = document.getElementById('type').value;
+        const m = parseFloat(document.getElementById('length').value);
+        const w = parseFloat(document.getElementById('width').value);
+        const v = parseFloat(document.getElementById('height').value);
+        const y = parseFloat(document.getElementById('weight').value);
+        const b = parseFloat(document.getElementById('declared').value);
+
+        if ([m,w,v,y,b].some(isNaN)) {
+          alert('Моля, попълнете всички полета коректно.');
+          return;
+        }
+
+        let res = (type === 'sea') ? calcWater(m,w,v,b) : calcAir(m,w,v,y,b);
+
+        let deliveryInfo = '';
+        if (type === 'sea') {
+          deliveryInfo = `
+            <em>Доставка 45–60 дни, след пристигане на пратката в склада ни в САЩ.</em><br>
+            <em>Крайната цена на доставка се определя и заплаща след пристигане на пратката в склада и измерване на реалните размери и тегло.</em>
+          `;
+        } else {
+          deliveryInfo = `
+            <em>Доставка 8–12 дни, след пристигане на пратката в склада ни в САЩ.</em><br>
+            <em>Крайната цена на доставка се определя и заплаща след пристигане на пратката в склада и измерване на реалните размери и тегло.</em>
+          `;
+        }
+
+        document.getElementById('result').innerHTML = `
+          <div><b>Тип:</b> ${type === 'sea' ? 'По вода' : 'По въздух'}</div>
+          <div><b>Доставка:</b> $${res.delivery.toFixed(2)}</div>
+          <div><b>Митническо обслужване:</b> $${res.duty.toFixed(2)}</div>
+          <div><b>ДДС:</b> $${res.vat.toFixed(2)}</div>
+          <div><b>Общо:</b> <b>$${res.total.toFixed(2)}</b></div>
+          <hr>
+          <div style="margin-top:8px; color:#555;">${deliveryInfo}</div>
+        `;
+      });
+      </script>
+
+      <hr>
+
+      <!-- === Секция: Доставка от Англия и Европа (преместена надолу) === -->
+      <h2><b>🚚 Доставка от Англия и Европа</b></h2>
       <p>Повечето доставки до локален адрес са безплатни и отнемат от 1 до 3 работни дни. В редки случаи (напр. двигател, скоростна кутия, капак, врата), може да се начисли такса за локална доставка.</p>
       <p>След получаване в депо, частите се придвижват до България (обикновено веднъж седмично), а оттам се изпращат чрез Еконт до клиента. Целият процес трае <strong>до 9–10 дни</strong>.</p>
       <p>Частите се заплащат онлайн при поръчка. Таксата за доставка се заплаща с наложен платеж при получаване в офис или на адрес чрез Еконт.</p>
+
       <h4>📄 Фиксирани цени за обемисти части:</h4>
       <ul>
-        <li>Двигател 4 цил. — 205 €</li>
-        <li>Двигател 6 цил. — 256 €</li>
+        <li>Двигател 4 цил. — 205 €</li>
+        <li>Двигател 6 цил. — 256 €</li>
         <li>Скоростна кутия (малка) — 77 €</li>
         <li>Скоростна кутия (голяма/автоматична) — 103 €</li>
         <li>Ауспух / Генерация — 117 €</li>
-        <li>Багажник (до 120 см) — 140 €</li>
+        <li>Багажник (до 120 см) — 140 €</li>
         <li>Заден мост — 117 €</li>
         <li>Капак — 76 €</li>
         <li>Броня (предна/задна) — 93.4 €</li>
@@ -44,170 +189,32 @@
         <li>Предна седалка — 59 €</li>
         <li>Предна броня (бус/камион) — 117 €</li>
       </ul>
+
       <h4>💸 Доставка според теглото:</h4>
       <ul>
-        <li><strong>До 10 кг:</strong> Офис Еконт — 17 € / Адрес — 19 €</li>
-        <li><strong>Над 10 кг:</strong> Офис Еконт — 1.7 €/кг / Адрес — 1.9 €/кг</li>
+        <li><strong>До 10 кг:</strong> Офис Еконт — 17 € / Адрес — 19 €</li>
+        <li><strong>Над 10 кг:</strong> Офис Еконт — 1.7 €/кг / Адрес — 1.9 €/кг</li>
       </ul>
       <p>Доставките се извършват по действащите тарифи на Еконт.</p>
+
       <hr>
-<hr>
-<h2><b> ✈️ Доставка от САЩ</b></h2>
-
-<div id="usa-shipping">
-  <p>Изчислете ориентировъчната цена за доставка от САЩ до България:</p>
-
-  <div class="calculator-box">
-    <label>Вид транспорт:</label>
-    <select id="type">
-      <option value="air">✈️ По въздух</option>
-      <option value="sea">🚢 По вода</option>
-    </select>
-
-    <label>Дължина (см):</label>
-    <input type="number" id="length" placeholder="напр. 60">
-
-    <label>Ширина (см):</label>
-    <input type="number" id="width" placeholder="напр. 40">
-
-    <label>Височина (см):</label>
-    <input type="number" id="height" placeholder="напр. 30">
-
-    <label>Тегло (кг):</label>
-    <input type="number" id="weight" placeholder="напр. 5">
-
-    <label>Декларирана стойност (USD):</label>
-    <input type="number" id="declared" placeholder="напр. 200">
-
-    <button id="calc" class="primary-btn">Виж цена на доставка</button>
-
-    <div class="result" id="result"></div>
-  </div>
-</div>
-
-<style>
-  #usa-shipping { background: #fff; padding: 15px; border-radius: 8px; margin-top: 15px; }
-  #usa-shipping label { display: block; margin-top: 6px; font-weight: 500; }
-  #usa-shipping input, #usa-shipping select {
-    width: 100%; padding: 6px; margin-bottom: 6px; border: 1px solid #ddd; border-radius: 4px;
-  }
-  #usa-shipping .primary-btn {
-    background: #1b6ec2; color: #fff; border: none; border-radius: 6px;
-    padding: 8px 14px; cursor: pointer; margin-top: 8px;
-  }
-  #usa-shipping .result { margin-top: 15px; background: #f9f9f9; padding: 10px; border-radius: 6px; }
-</style>
-
-<script>
-function calcWater(m, w, v, y) {
-  var b = m / 2.54, S = w / 2.54, A = v / 2.54, I = b * S * A, P = m * w * v, E = I * 0.007;
-  if (E < 15) E = 15;
-  E *= 1.2;
-  var T = (100 / 2.54) ** 3, O = T * 0.007;
-  if (O < 15) O = 15;
-  O *= 1.2;
-  if (P > 1000000) { E *= 0.5; if (E < O) E = O; }
-
-  // ✳️ Добавяме markup 10%
-  E *= 1.10;
-
-  let M = y * 0.07; // 7% митническо обслужване
-  let x = y * 0.2;  // 20% ДДС
-  return { delivery: E, duty: M, vat: x, total: E + M + x };
-}
-
-function calcAir(m, w, v, y, b) {
-  let S = m * w * v, A = 0;
-  if (m <= 15 && w <= 15 && v <= 15) {
-    A = (m <= 10 && w <= 10 && v <= 10) ? 15 : 25;
-    let E = 4;
-    if (y > E) A += (y - E) * 6;
-  } else {
-    let E = [
-      { volume: 27000, cost: 63 },
-      { volume: 27900, cost: 63.7 },
-      { volume: 28800, cost: 64.63 },
-      { volume: 33728, cost: 69.72 },
-      { volume: 74088, cost: 111.43 }
-    ];
-    A = E[0].cost;
-    for (let O = 0; O < E.length - 1; O++) {
-      if (S <= E[O + 1].volume) {
-        let M = E[O].volume, x = E[O + 1].volume, _ = E[O].cost, $ = E[O + 1].cost;
-        A = _ + (S - M) * ($ - _) / (x - M);
-        break;
-      }
-    }
-    if (S > E[E.length - 1].volume) A += (S - E[E.length - 1].volume) * 0.001033;
-    let T = S * 1.63 / 10000;
-    if (y > T + 4) A += (y - T - 4) * 7;
-  }
-
-  // ✳️ Добавяме markup 10%
-  A *= 1.10;
-
-  let I = b * 0.07; // 7% митническо обслужване
-  let P = b * 0.2;  // 20% ДДС
-  return { delivery: A, duty: I, vat: P, total: A + I + P };
-}
-
-document.getElementById('calc').addEventListener('click', function() {
-  const type = document.getElementById('type').value;
-  const m = parseFloat(document.getElementById('length').value);
-  const w = parseFloat(document.getElementById('width').value);
-  const v = parseFloat(document.getElementById('height').value);
-  const y = parseFloat(document.getElementById('weight').value);
-  const b = parseFloat(document.getElementById('declared').value);
-
-  if ([m,w,v,y,b].some(isNaN)) {
-    alert('Моля, попълнете всички полета коректно.');
-    return;
-  }
-
-  let res = (type === 'sea') ? calcWater(m,w,v,b) : calcAir(m,w,v,y,b);
-
-  // Допълнителна информация според типа транспорт
-  let deliveryInfo = '';
-  if (type === 'sea') {
-    deliveryInfo = `
-      <em>Доставка 45–60 дни, след пристигане на пратката в склада ни в САЩ.</em><br>
-      <em>Крайната цена на доставка се определя и заплаща след пристигане на пратката в склада и измерване на реалните размери и тегло.</em>
-    `;
-  } else {
-    deliveryInfo = `
-      <em>Доставка 8–12 дни, след пристигане на пратката в склада ни в САЩ.</em><br>
-      <em>Крайната цена на доставка се определя и заплаща след пристигане на пратката в склада и измерване на реалните размери и тегло.</em>
-    `;
-  }
-
-  document.getElementById('result').innerHTML = `
-    <div><b>Тип:</b> ${type === 'sea' ? 'По вода' : 'По въздух'}</div>
-    <div><b>Доставка:</b> $${res.delivery.toFixed(2)}</div>
-    <div><b>Митническо обслужване:</b> $${res.duty.toFixed(2)}</div>
-    <div><b>ДДС:</b> $${res.vat.toFixed(2)}</div>
-    <div><b>Общо:</b> <b>$${res.total.toFixed(2)}</b></div>
-    <hr>
-    <div style="margin-top:8px; color:#555;">${deliveryInfo}</div>
-  `;
-});
-</script>
-
-
-
 
       <h3>🔁 Връщане</h3>
       <p>Ако получите несъвместима или дефектна част – ние ще ви съдействаме напълно.</p>
       <p>Връщането към доставчика (в Европа или Англия) обикновено е безплатно. Клиентът поема единствено разходите по изпращането до съответната страна.</p>
     </div>
   </section>
+
   <script>
-  document.querySelector('.close-info-btn').addEventListener('click', () => {
-    if (document.referrer) {
-      window.location.href = document.referrer;
-    } else {
-      window.location.href = 'index.html'; // fallback ако е отворено директно
-    }
-  });
-</script>
+    document.querySelector('.close-info-btn').addEventListener('click', () => {
+      if (document.referrer) {
+        window.location.href = document.referrer;
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+
 </body>
 </html>
+
