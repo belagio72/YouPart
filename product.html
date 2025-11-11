@@ -4,21 +4,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Преглед на авточаст – YouPart</title>
-  
-  <script>
-  // Добавяме canonical линк според реалния URL
-  const canonicalLink = document.createElement('link');
-  canonicalLink.rel = 'canonical';
-  canonicalLink.href = window.location.href;
-  document.head.appendChild(canonicalLink);
-</script>
 
+  <title>Преглед на авточаст – YouPart</title>
+
+  <!-- Ще се попълни от сървъра с реалния URL на продукта -->
+  <link rel="canonical" href="{{CANONICAL_URL}}">
+
+  <!-- Този description може да остане, OG описанието идва от сървъра -->
   <meta name="description" content="Детайлна информация за избраната авточаст. Виж цена, снимки, доставка и лесен начин за поръчка с доставка до България.">
-  <meta property="og:image" content="https://youpart.net/logo-og.jpg">
+
+  <!-- Тук СЪРВЪРЪТ ще инжектира OG + Twitter тагове за конкретния продукт -->
+  <!--OG_DYNAMIC-->
+
   <link rel="stylesheet" href="style.css">
 </head>
+
 
 <body>
   <!-- Десктоп хедър -->
@@ -75,7 +75,7 @@
 <div class="custom-buttons">
   <a class="uiverse-btn" href="index.html">Начало</a>
   <a class="uiverse-btn" href="how-it-works.html">Как работи?</a>
-  <a class="uiverse-btn" href="delivery-returns.html">Доставка и връщане</a>
+  <a class="uiverse-btn" href="delivery-returns.html">Калкулатор доставка</a>
 </div>
 
 
@@ -108,7 +108,7 @@
   <div class="cart-delivery-group">
     <button class="btn btn-primary" id="addToCartBtn">Добави в количката</button>
     <a href="delivery-returns.html" class="delivery-info-link">
-  📦 <span>Виж цена на доставка</span>
+  📦 <span>Калкулатор доставка</span>
 </a>
 
   </div>
