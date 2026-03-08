@@ -27,6 +27,14 @@ function generateSearchSessionToken() {
   return crypto.randomBytes(24).toString('hex');
 }
 
+function getClientIp(req) {
+  return (
+    req.headers['cf-connecting-ip'] ||
+    req.headers['x-forwarded-for']?.split(',')[0] ||
+    req.ip
+  );
+}
+
 function getNextOrderNumber() {
   try {
     const data = fs.readFileSync(counterPath, 'utf-8');
@@ -730,11 +738,13 @@ const searchLimiter = rateLimit({
 });
 
 app.get('/search', searchLimiter, async (req, res) => {
-  console.log("Search request IP:", req.ip);
+  const clientIp = getClientIp(req);
+
+  console.log("Search request IP:", clientIp);
 
   cleanupAbuseTracker();
 
-  const ipCheck = checkIpAbuse(req.ip);
+  const ipCheck = checkIpAbuse(clientIp);
 
   if (ipCheck.hardBlocked) {
     return res.status(429).json({ error: "Too many requests" });
