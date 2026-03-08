@@ -361,6 +361,18 @@ app.post('/api/settings', (req, res) => {
   }
 });
 
+function isAllowedTranslationSource(req) {
+  const origin = req.headers.origin || '';
+  const referer = req.headers.referer || '';
+
+  return (
+    origin.includes('youpart.net') ||
+    referer.includes('youpart.net') ||
+    origin.includes('localhost') ||
+    referer.includes('localhost')
+  );
+}
+
 function isAllowedSearchSource(req) {
   const origin = req.get('origin') || '';
   const referer = req.get('referer') || '';
@@ -728,7 +740,8 @@ app.get('/search', searchLimiter, async (req, res) => {
     return res.status(429).json({ error: "Too many requests" });
   }
 
-  const translationAllowedForIp = ipCheck.translationAllowed;
+  const translationAllowedForIp =
+    ipCheck.translationAllowed && isAllowedTranslationSource(req);
 
   let query = req.query.part;
   const offset = parseInt(req.query.offset || '0');
