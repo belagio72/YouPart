@@ -238,7 +238,7 @@ function ensureTranslateUsageMonth() {
 
 function canUseGoogleTranslate() {
   ensureTranslateUsageMonth();
-  return translateUsage.characters < 1000;
+  return translateUsage.characters < 1000000;
 }
 
 function addTranslatedCharacters(count) {
