@@ -1,9 +1,11 @@
 // 📁 server.js — актуализирана версия
 require('dotenv').config(); // Трябва да е най-отгоре
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const searchAbuseTracker = {};
+const path = require('path');
+const translateUsagePath = path.join(__dirname, 'translate_usage.json');
 const express = require('express');
 const axios = require('axios');
-const path = require('path');
 const fs = require('fs');
 const ordersPath = path.join(__dirname, 'orders.json');
 const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -11,6 +13,7 @@ const telegramChatId = '7367702928';
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const settingsPath = path.join(__dirname, 'settings.json');
 const nodemailer = require('nodemailer');
+const cookieParser = require('cookie-parser');
 const translationsPath = path.join(__dirname, 'translations.json');
 const counterPath = path.join(__dirname, 'orderCounter.json');
 const rateLimit = require('express-rate-limit');
@@ -19,6 +22,10 @@ const checkoutLimiter = rateLimit({
   max: 5,              // до 5 заявки на минута на IP
   message: '🚫 Прекалено много опити за плащане. Моля, опитайте отново след малко.'
 });
+
+function generateSearchSessionToken() {
+  return crypto.randomBytes(24).toString('hex');
+}
 
 function getNextOrderNumber() {
   try {
@@ -31,6 +38,74 @@ function getNextOrderNumber() {
     console.error('⚠️ Грешка при четене на orderCounter.json:', err);
     return Date.now(); // fallback уникално число
   }
+}
+
+let translateUsage = loadTranslateUsage();
+
+let activeTranslations = 0;
+const MAX_CONCURRENT_TRANSLATIONS = 5;
+
+function cleanupAbuseTracker() {
+  const now = Date.now();
+
+  for (const ip of Object.keys(searchAbuseTracker)) {
+    const entry = searchAbuseTracker[ip];
+
+    if (
+      now > entry.minuteWindowStart + 60 * 1000 &&
+      now > entry.translationBlockedUntil &&
+      now > entry.hardBlockedUntil
+    ) {
+      delete searchAbuseTracker[ip];
+    }
+  }
+}
+
+function checkIpAbuse(ip) {
+  const now = Date.now();
+
+  if (!searchAbuseTracker[ip]) {
+    searchAbuseTracker[ip] = {
+      minuteWindowStart: now,
+      minuteCount: 0,
+      translationBlockedUntil: 0,
+      hardBlockedUntil: 0,
+      alertSent: false
+    };
+  }
+
+  const entry = searchAbuseTracker[ip];
+
+  if (entry.hardBlockedUntil > now) {
+    return { hardBlocked: true, translationAllowed: false };
+  }
+
+  if (entry.translationBlockedUntil > now) {
+    return { hardBlocked: false, translationAllowed: false };
+  }
+
+  if (now - entry.minuteWindowStart > 60 * 1000) {
+    entry.minuteWindowStart = now;
+    entry.minuteCount = 0;
+  }
+
+  entry.minuteCount++;
+
+  if (entry.minuteCount > 20) {
+    entry.translationBlockedUntil = now + 24 * 60 * 60 * 1000;
+
+    if (!entry.alertSent) {
+      entry.alertSent = true;
+
+      sendTelegramMessage(
+        `⚠️ Suspicious search activity detected from IP ${ip}. Translation blocked for 24h.`
+      );
+    }
+
+    return { hardBlocked: false, translationAllowed: false };
+  }
+
+  return { hardBlocked: false, translationAllowed: true };
 }
 
 // Зареждане на кеша с преводи
@@ -59,6 +134,9 @@ const TELEGRAM_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMess
 
 const app = express();
 
+app.set('trust proxy', 1);
+
+
 app.get('/sitemap.xml', (req, res) => {
   res.header('Content-Type', 'application/xml');
   res.send(`<?xml version="1.0" encoding="UTF-8"?>
@@ -70,6 +148,19 @@ app.get('/sitemap.xml', (req, res) => {
   <url><loc>https://youpart.net/delivery-returns.html</loc></url>
   <url><loc>https://youpart.net/legal.html</loc></url>
 </urlset>`);
+});
+
+app.get('/search-session', (req, res) => {
+  const token = generateSearchSessionToken();
+
+  res.cookie('search_session', token, {
+    httpOnly: true,
+    sameSite: 'Lax',
+    secure: false, // локално; на Render после ще стане true
+    maxAge: 24 * 60 * 60 * 1000
+  });
+
+  res.json({ ok: true });
 });
 
 const { registerUser, loginUser } = require('./auth');
@@ -85,6 +176,68 @@ function loadSettings() {
     console.error('⚠️ Грешка при зареждане на settings.json:', err.message);
     return { markup: 1.2 };
   }
+}
+
+function getCurrentMonthKey() {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+}
+
+function loadTranslateUsage() {
+  try {
+    if (fs.existsSync(translateUsagePath)) {
+      const raw = fs.readFileSync(translateUsagePath, 'utf-8');
+      return JSON.parse(raw);
+    }
+  } catch (e) {
+    console.error('❌ Грешка при четене на translate_usage.json:', e.message);
+  }
+
+  return {
+    month: getCurrentMonthKey(),
+    characters: 0,
+    alertSent: false
+  };
+}
+
+function saveTranslateUsage() {
+  try {
+    fs.writeFileSync(
+      translateUsagePath,
+      JSON.stringify(translateUsage, null, 2),
+      'utf-8'
+    );
+  } catch (e) {
+    console.error('❌ Грешка при запис на translate_usage.json:', e.message);
+  }
+}
+
+function ensureTranslateUsageMonth() {
+  const currentMonth = getCurrentMonthKey();
+
+  if (translateUsage.month !== currentMonth) {
+    translateUsage = {
+      month: currentMonth,
+      characters: 0,
+      alertSent: false
+    };
+
+    saveTranslateUsage();
+  }
+}
+
+function canUseGoogleTranslate() {
+  ensureTranslateUsageMonth();
+  return translateUsage.characters < 1000000;
+}
+
+function addTranslatedCharacters(count) {
+  ensureTranslateUsageMonth();
+
+  translateUsage.characters += count;
+  saveTranslateUsage();
 }
 
 app.post('/api/settings', (req, res) => {
@@ -124,6 +277,7 @@ app.use((req, res, next) => {
 
 
 app.use('/webhook', express.raw({ type: 'application/json' }));
+app.use(cookieParser());
 app.use(express.static(__dirname));
 
 // Актуализиран endpoint за съобщения
@@ -207,6 +361,21 @@ app.post('/api/settings', (req, res) => {
   }
 });
 
+function isAllowedSearchSource(req) {
+  const origin = req.get('origin') || '';
+  const referer = req.get('referer') || '';
+
+  const allowedSources = [
+    'https://youpart.net',
+    'https://www.youpart.net',
+    'http://localhost:3000'
+  ];
+
+  return allowedSources.some(src =>
+    origin.startsWith(src) || referer.startsWith(src)
+  );
+}
+
 // Ключови промени за обработка на бележките
 function readOrders() {
   try {
@@ -217,6 +386,9 @@ function readOrders() {
     return [];
   }
 }
+
+
+saveTranslateUsage();
 
 app.post('/admin/update-note', (req, res) => {
   const { orderNumber, note } = req.body;
@@ -306,6 +478,32 @@ async function updateExchangeRates() {
     console.log('🔄 Обновени курсове:', exchangeRates);
   } catch (error) {
     console.error('❌ Грешка при обновяване на курсовете:', error.message);
+  }
+}
+
+async function sendTelegramMessage(text) {
+  try {
+    await axios.post(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+      chat_id: telegramChatId,
+      text: text
+    });
+  } catch (error) {
+    console.error("❌ Telegram error:", error.message);
+  }
+}
+
+async function notifyTranslateLimitReached() {
+  if (translateUsage.alertSent) return;
+
+  translateUsage.alertSent = true;
+  saveTranslateUsage();
+
+  try {
+    await sendTelegramMessage(
+      `⚠️ Google Translate limit reached: ${translateUsage.characters} characters for ${translateUsage.month}. Translation is now disabled.`
+    );
+  } catch (e) {
+    console.error('❌ Грешка при изпращане на Telegram alert:', e.message);
   }
 }
 
@@ -418,9 +616,18 @@ ${messageItems}
 
 async function detectLanguage(text) {
   try {
-    const response = await axios.post('https://translation.googleapis.com/language/translate/v2/detect', { q: text }, {
-      params: { key: process.env.GOOGLE_TRANSLATE_KEY },
-    });
+    if (!canUseGoogleTranslate()) {
+      return 'en';
+    }
+
+    const response = await axios.post(
+      'https://translation.googleapis.com/language/translate/v2/detect',
+      { q: text },
+      {
+        params: { key: process.env.GOOGLE_TRANSLATE_KEY }
+      }
+    );
+
     return response.data.data.detections[0][0].language;
   } catch (error) {
     console.error('❌ Грешка при разпознаване на езика:', error.message);
@@ -455,25 +662,96 @@ async function cachedTranslate(text, sourceLang, targetLang) {
 
 async function translateText(text, from, to) {
   try {
-    const response = await axios.post('https://translation.googleapis.com/language/translate/v2', null, {
-      params: { q: text, source: from, target: to, key: process.env.GOOGLE_TRANSLATE_KEY },
-    });
-    return response.data.data.translations[0].translatedText;
+
+    if (activeTranslations >= MAX_CONCURRENT_TRANSLATIONS) {
+      return text;
+    }
+
+    if (!canUseGoogleTranslate()) {
+      await notifyTranslateLimitReached();
+      return text;
+    }
+
+    activeTranslations++;
+
+    const response = await axios.post(
+      'https://translation.googleapis.com/language/translate/v2',
+      null,
+      {
+        params: {
+          q: text,
+          source: from,
+          target: to,
+          key: process.env.GOOGLE_TRANSLATE_KEY
+        }
+      }
+    );
+
+    const translated = response.data.data.translations[0].translatedText;
+
+    addTranslatedCharacters(String(text || '').length);
+
+    if (!canUseGoogleTranslate()) {
+      await notifyTranslateLimitReached();
+    }
+
+    return translated;
+
   } catch (error) {
+
     console.error('❌ Грешка при превод:', error.message);
     return text;
+
+  } finally {
+
+    activeTranslations--;
+
   }
 }
 
-app.get('/search', async (req, res) => {
+const searchLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 минута
+  max: 20, // до 20 search заявки на IP за минута
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Твърде много търсения. Опитайте отново след малко.' }
+});
+
+app.get('/search', searchLimiter, async (req, res) => {
+  console.log("Search request IP:", req.ip);
+
+  cleanupAbuseTracker();
+
+  const ipCheck = checkIpAbuse(req.ip);
+
+  if (ipCheck.hardBlocked) {
+    return res.status(429).json({ error: "Too many requests" });
+  }
+
+  const translationAllowedForIp = ipCheck.translationAllowed;
+
   let query = req.query.part;
   const offset = parseInt(req.query.offset || '0');
   const region = req.query.region || 'europe';
   const condition = req.query.condition || 'used';
 
+  if (!isAllowedSearchSource(req)) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+
   if (query === 'random') {
     const sampleWords = ['brake', 'bumper', 'headlight', 'rims', 'liftgate'];
     query = sampleWords[Math.floor(Math.random() * sampleWords.length)];
+  }
+
+  if (!query || typeof query !== 'string') {
+    return res.status(400).json({ error: 'Missing query' });
+  }
+
+  query = query.trim();
+
+  if (query.length < 2 || query.length > 100) {
+    return res.status(400).json({ error: 'Invalid search query' });
   }
 
   if (!query) return res.status(400).send('Грешка: Missing query');
@@ -524,7 +802,7 @@ app.get('/search', async (req, res) => {
       },
       params: {
         q: translatedQuery,
-        limit: 20,
+        limit: 10,
         offset,
         buying_options: 'FIXED_PRICE',
         sort: 'bestMatch',
@@ -563,12 +841,13 @@ let translatedTitle;
 
 if (translations[item.title]) {
   translatedTitle = translations[item.title];
-} else {
+} else if (translationAllowedForIp && canUseGoogleTranslate()) {
   translatedTitle = await cachedTranslate(item.title, 'en', 'bg');
   translations[item.title] = translatedTitle;
 
-  // Записваме кеша
   fs.writeFileSync(translationsPath, JSON.stringify(translations, null, 2));
+} else {
+  translatedTitle = item.title;
 }
 
 
@@ -585,7 +864,7 @@ if (translations[item.title]) {
       })
     );
 
-    res.json({ results, hasMore: items.length === 20 });
+    res.json({ results, hasMore: items.length === 10 });
   } catch (err) {
     console.error('⚠️ Грешка при заявка към eBay /search:', err.message);
     res.status(500).json({ error: 'Product fetch failed' });
@@ -794,6 +1073,8 @@ app.post('/api/reply', (req, res) => {
     res.status(500).json({ error: 'Неуспешен запис' });
   }
 });
+
+
 
 app.post('/create-checkout-session', checkoutLimiter, async (req, res) => {
   try {
