@@ -4,6 +4,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const searchAbuseTracker = {};
 const path = require('path');
 const translateUsagePath = path.join(__dirname, 'translate_usage.json');
+const rateLimit = require('express-rate-limit');
 const express = require('express');
 const axios = require('axios');
 const fs = require('fs');
@@ -16,7 +17,6 @@ const nodemailer = require('nodemailer');
 const cookieParser = require('cookie-parser');
 const translationsPath = path.join(__dirname, 'translations.json');
 const counterPath = path.join(__dirname, 'orderCounter.json');
-const rateLimit = require('express-rate-limit');
 const checkoutLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 минута
   max: 5,              // до 5 заявки на минута на IP
@@ -280,6 +280,20 @@ app.use((req, res, next) => {
   }
 });
 
+const searchLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 минута
+  max: 20, // до 20 search заявки на IP за минута
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Твърде много търсения. Опитайте отново след малко.' }
+});
+
+const contactLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 минута
+  max: 3, // максимум 3 съобщения на минута от едно IP
+  message: '🚫 Прекалено много съобщения. Моля опитайте след малко.'
+});
+
 
 
 app.use('/webhook', express.raw({ type: 'application/json' }));
@@ -287,7 +301,13 @@ app.use(cookieParser());
 app.use(express.static(__dirname));
 
 // Актуализиран endpoint за съобщения
-app.post('/api/message', async (req, res) => {
+app.post('/api/message', contactLimiter, async (req, res) => {
+
+  // Honeypot защита срещу ботове
+  if (req.body.website) {
+    return res.status(200).json({ success: true });
+  }
+
   const { name, contact, message } = req.body;
 
   if (!name || !contact || !message) {
@@ -727,14 +747,6 @@ async function translateText(text, from, to) {
 
   }
 }
-
-const searchLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 минута
-  max: 20, // до 20 search заявки на IP за минута
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Твърде много търсения. Опитайте отново след малко.' }
-});
 
 app.get('/search', searchLimiter, async (req, res) => {
   const clientIp = getClientIp(req);
