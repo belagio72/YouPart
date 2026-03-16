@@ -136,9 +136,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Telegram конфигурация
-const TELEGRAM_BOT_TOKEN = '8074091356:AAHlninDNL8XFeKxJXs4q6EF5FG0qcrnF7U';
-const TELEGRAM_CHAT_ID = '7367702928';
-const TELEGRAM_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+const TELEGRAM_URL = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
 
 const app = express();
 
@@ -326,11 +324,12 @@ app.post('/api/message', async (req, res) => {
     console.log('📧 Имейл изпратен до администратора');
 
     // Изпращане към Telegram
-    const telegramMessage = `📥 НОВО СЪОБЩЕНИЕ:\n👤 ${name}\n📧 ${contact}\n💬 ${message}`;
-    await axios.post(TELEGRAM_URL, {
-      chat_id: TELEGRAM_CHAT_ID,
-      text: telegramMessage
-    });
+const telegramMessage = `📥 НОВО СЪОБЩЕНИЕ:\n👤 ${name}\n📧 ${contact}\n💬 ${message}`;
+
+await axios.post(TELEGRAM_URL, {
+  chat_id: telegramChatId,
+  text: telegramMessage
+});
 
     res.json({ success: true });
   } catch (err) {
