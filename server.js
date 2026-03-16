@@ -9,7 +9,7 @@ const axios = require('axios');
 const fs = require('fs');
 const ordersPath = path.join(__dirname, 'orders.json');
 const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
-const telegramChatId = '7367702928';
+const telegramChatId = process.env.TELEGRAM_CHAT_ID;
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const settingsPath = path.join(__dirname, 'settings.json');
 const nodemailer = require('nodemailer');
@@ -126,12 +126,12 @@ try {
 }
 // Конфигурация за Zoho Mail
 const transporter = nodemailer.createTransport({
-  host: "smtp.zoho.eu",
-  port: 465,
+  host: process.env.ZOHO_SMTP_HOST,
+  port: Number(process.env.ZOHO_SMTP_PORT || 465),
   secure: true,
   auth: {
-    user: "contact@youpart.net",
-    pass: "Bg995511" // Паролата за Zoho акаунта
+    user: process.env.ZOHO_SMTP_USER,
+    pass: process.env.ZOHO_SMTP_PASS
   }
 });
 
