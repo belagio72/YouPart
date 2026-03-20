@@ -1698,6 +1698,117 @@ img#visaLogo {
   height: 100%;
   border-radius: 50%;
 }
+.top-row-under-header {
+  max-width: 1200px;
+  margin: 0 auto 20px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  box-sizing: border-box;
+}
 
+.banner-shudderfix {
+  flex: 0 0 auto;
+}
+
+.banner-shudderfix a {
+  display: block;
+  width: 280px;
+  max-width: 100%;
+}
+
+.banner-shudderfix img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.custom-buttons {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  align-items: flex-start;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .top-row-under-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .banner-shudderfix a {
+    width: 220px;
+  }
+
+  .custom-buttons {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+@keyframes shake-burst {
+  0% { transform: translate(0, 0); }
+
+  /* бърза вибрация */
+  2% { transform: translate(-2px, 2px); }
+  4% { transform: translate(2px, -2px); }
+  6% { transform: translate(-2px, -2px); }
+  8% { transform: translate(2px, 2px); }
+  10% { transform: translate(-2px, 2px); }
+  12% { transform: translate(2px, -2px); }
+
+  /* край на тресенето */
+  14% { transform: translate(0, 0); }
+
+  /* дълга пауза */
+  100% { transform: translate(0, 0); }
+}
+
+.banner-shudderfix img {
+  animation: shake-burst 4s infinite;
+}
+@media (max-width: 768px) {
+
+  .top-row-under-header {
+    flex-direction: column;   /* подреждаме един под друг */
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  /* 1️⃣ бутоните да са първи */
+  .custom-buttons {
+    order: 1;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;        /* да са в 1 ред */
+    gap: 6px;
+  }
+
+  .custom-buttons a {
+    flex: 1;                  /* да се разпределят равномерно */
+    text-align: center;
+    font-size: 12px;
+    padding: 6px 4px;
+    white-space: nowrap;
+  }
+
+  /* 2️⃣ банерът да е втори */
+  .banner-shudderfix {
+    order: 2;
+    width: 100%;
+  }
+
+  .banner-shudderfix a {
+    width: 100%;              /* на цял ред */
+  }
+
+  .banner-shudderfix img {
+    width: 100%;
+  }
+}
 
 
