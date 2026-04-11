@@ -147,13 +147,24 @@ app.get('/sitemap.xml', (req, res) => {
   res.header('Content-Type', 'application/xml');
   res.send(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
   <url><loc>https://youpart.net/</loc></url>
   <url><loc>https://youpart.net/product.html</loc></url>
   <url><loc>https://youpart.net/cart.html</loc></url>
   <url><loc>https://youpart.net/how-it-works.html</loc></url>
   <url><loc>https://youpart.net/delivery-returns.html</loc></url>
   <url><loc>https://youpart.net/legal.html</loc></url>
+
+  <!-- ✅ BRAND SEO СТРАНИЦИ -->
+  <url><loc>https://youpart.net/brands/avtochasti-bmw.html</loc></url>
+  <url><loc>https://youpart.net/brands/avtochasti-audi.html</loc></url>
+  <url><loc>https://youpart.net/brands/avtochasti-toyota.html</loc></url>
+
 </urlset>`);
+});
+
+app.get('/brands/:brand', (req, res) => {
+  res.sendFile(path.join(__dirname, 'brands', 'index.html'));
 });
 
 app.get('/search-session', (req, res) => {
