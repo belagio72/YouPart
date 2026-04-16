@@ -140,6 +140,16 @@ const TELEGRAM_URL = `https://api.telegram.org/bot${telegramBotToken}/sendMessag
 
 const app = express();
 
+app.use((req, res, next) => {
+  const host = req.get('host');
+
+  if (host === 'youpart.net') {
+    return res.redirect(301, `https://www.youpart.net${req.originalUrl}`);
+  }
+
+  next();
+});
+
 app.set('trust proxy', 1);
 
 
@@ -148,17 +158,17 @@ app.get('/sitemap.xml', (req, res) => {
   res.send(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <url><loc>https://youpart.net/</loc></url>
-  <url><loc>https://youpart.net/product.html</loc></url>
-  <url><loc>https://youpart.net/cart.html</loc></url>
-  <url><loc>https://youpart.net/how-it-works.html</loc></url>
-  <url><loc>https://youpart.net/delivery-returns.html</loc></url>
-  <url><loc>https://youpart.net/legal.html</loc></url>
+  <url><loc>https://www.youpart.net/</loc></url>
+  <url><loc>https://www.youpart.net/product.html</loc></url>
+  <url><loc>https://www.youpart.net/cart.html</loc></url>
+  <url><loc>https://www.youpart.net/how-it-works.html</loc></url>
+  <url><loc>https://www.youpart.net/delivery-returns.html</loc></url>
+  <url><loc>https://www.youpart.net/legal.html</loc></url>
 
   <!-- ✅ BRAND SEO СТРАНИЦИ -->
-  <url><loc>https://youpart.net/brands/avtochasti-bmw.html</loc></url>
-  <url><loc>https://youpart.net/brands/avtochasti-audi.html</loc></url>
-  <url><loc>https://youpart.net/brands/avtochasti-toyota.html</loc></url>
+  <url><loc>https://www.youpart.net/brands/avtochasti-bmw.html</loc></url>
+  <url><loc>https://www.youpart.net/brands/avtochasti-audi.html</loc></url>
+  <url><loc>https://www.youpart.net/brands/avtochasti-toyota.html</loc></url>
 
 </urlset>`);
 });
@@ -416,7 +426,6 @@ function isAllowedSearchSource(req) {
   const referer = req.get('referer') || '';
 
   const allowedSources = [
-    'https://youpart.net',
     'https://www.youpart.net',
     'http://localhost:3000'
   ];
@@ -610,8 +619,8 @@ app.post('/order', async (req, res) => {
 
   const messageItems = (order.items || []).map((item, index) => {
   const youpartLink = item.itemId && item.priceBGN
-    ? `https://youpart.net/product.html?id=${item.itemId}&priceBGN=${item.priceBGN}`
-    : 'няма';
+    ? `https://www.youpart.net/product.html?id=${item.itemId}&priceBGN=${item.priceBGN}`
+    : 'няма'; 
 
   return `
 🔹 Продукт ${index + 1}:
@@ -967,6 +976,51 @@ app.get('/api/resolve-id', async (req, res) => {
   } catch (err) {
     console.error('❌ eBay ID resolution error:', err);
     res.json({ error: 'Неуспешна заявка към eBay' });
+  }
+});
+app.get('/api/ebay-image-search', async (req, res) => {
+  const oe = (req.query.oe || '').trim();
+
+  if (!oe) {
+    return res.status(400).json({ error: 'Missing oe' });
+  }
+
+  try {
+    const accessToken = await getEbayAccessToken();
+
+    const ebayRes = await axios.get('https://api.ebay.com/buy/browse/v1/item_summary/search', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'X-EBAY-C-MARKETPLACE-ID': 'EBAY_GB'
+      },
+      params: {
+        q: oe,
+        limit: 12,
+        buying_options: 'FIXED_PRICE',
+        sort: 'bestMatch',
+        fieldgroups: 'EXTENDED',
+        filter: 'conditionIds:{1000},sellerLocationCountry:GB',
+        delivery_postal_code: 'WC2N5DU'
+      }
+    });
+
+    const items = ebayRes.data.itemSummaries || [];
+
+    const results = items.map(item => ({
+      itemId: item.itemId || '',
+      title: item.title || '',
+      image: item.image?.imageUrl || '',
+      ebayLink: item.itemWebUrl || ''
+    })).filter(item => item.image);
+
+    res.json({
+      oe,
+      count: results.length,
+      results
+    });
+  } catch (err) {
+    console.error('⚠️ Грешка при /api/ebay-image-search:', err.message);
+    res.status(500).json({ error: 'eBay image search failed' });
   }
 });
 
