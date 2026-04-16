@@ -7,12 +7,33 @@
   <title>Авточасти втора употреба | YouPart</title>
   <meta name="description" content="Авточасти втора употреба с доставка до България от Европа, Англия и САЩ.">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://youpart.net/brands/">
 
   <meta property="og:title" content="Авточасти втора употреба | YouPart">
   <meta property="og:description" content="Авточасти от Европа, Англия и САЩ с доставка до България.">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
+
+  <script>
+  (function () {
+    const currentUrl = 'https://www.youpart.net' + window.location.pathname;
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = currentUrl;
+
+    let ogUrl = document.querySelector('meta[property="og:url"]');
+    if (!ogUrl) {
+      ogUrl = document.createElement('meta');
+      ogUrl.setAttribute('property', 'og:url');
+      document.head.appendChild(ogUrl);
+    }
+    ogUrl.setAttribute('content', currentUrl);
+  })();
+</script>
 
   <link rel="stylesheet" href="../style.css">
 </head>
@@ -90,6 +111,27 @@
     <a class="uiverse-btn" href="/delivery-returns.html">Калкулатор доставка</a>
   </div>
 </div>
+
+<section style="padding:30px 0 10px;">
+  <div style="max-width:1100px;margin:0 auto;padding:0 20px;box-sizing:border-box;">
+    <div style="background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:22px 26px;box-shadow:0 4px 12px rgba(0,0,0,0.04);">
+      
+      <h2 id="catalog-heading" style="text-align:center;margin-top:0;">Търси нови части за тази марка</h2>
+      <p style="text-align:center;line-height:1.6;margin-bottom:18px;">
+        Изберете модел, след това категория, за да видите наличните нови части.
+      </p>
+
+      <div id="modelsContainer" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:22px;"></div>
+
+      <div id="selectedModelBox" style="display:none;text-align:center;margin:15px 0;font-weight:bold;"></div>
+
+      <div id="categoriesContainer" style="margin-top:10px;"></div>
+
+      <div id="productsContainer" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:24px;"></div>
+
+    </div>
+  </div>
+</section>
 
 <section style="padding:40px 0 20px;">
   <div style="max-width:950px;margin:0 auto;padding:0 20px;box-sizing:border-box;text-align:center;">
@@ -257,6 +299,281 @@
 </footer>
 
 <script>
+var CATALOG_API_BASE = 'http://127.0.0.1:5000';
+var selectedVehicleId = null;
+
+function escapeHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function slugToTitle(slug) {
+  if (!slug) return '';
+
+  var CATEGORY_BG = {
+    'edrogabaritni-avtochasti': 'Едрогабаритни авточасти',
+    'kori-i-podkalnitsi': 'Кори и подкалници',
+    'predni-podkalnitsi': 'Предни подкалници',
+    'ogledala-i-komponenti': 'Огледала и компоненти',
+    'kapachki-za-ogledala': 'Капачки за огледала',
+    'motorcheta-za-ogledala': 'Моторчета за огледала',
+    'ogledala': 'Огледала',
+    'stakla-za-ogledala': 'Стъкла за огледала',
+    'svetlini': 'Светлини',
+    'halogeni-i-dnevni-svetlini': 'Халогени и дневни светлини',
+    'lampi-registratsionen-nomer': 'Лампи за регистрационен номер',
+    'vatreshni-svetlini-po-kupeto': 'Вътрешни светлини по купето'
+  };
+
+  slug = String(slug).trim().toLowerCase();
+
+  if (CATEGORY_BG[slug]) {
+    return CATEGORY_BG[slug];
+  }
+
+  return slug
+    .split('-')
+    .filter(function(part) { return part; })
+    .map(function(part) {
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join(' ');
+}
+
+async function loadBrandModels(brandKey) {
+  const container = document.getElementById('modelsContainer');
+  if (!container || !brandKey) return;
+
+  container.innerHTML = '<p>Зареждане на модели...</p>';
+
+  try {
+    const res = await fetch(`${CATALOG_API_BASE}/models?brand=${encodeURIComponent(brandKey)}`);
+    const data = await res.json();
+
+    if (!data.models || !data.models.length) {
+      container.innerHTML = '<p>Все още няма заредени модели за тази марка.</p>';
+      return;
+    }
+
+    container.innerHTML = data.models.map(model => `
+      <button
+        type="button"
+        class="model-pill"
+        data-vehicle-id="${escapeHtml(model.vehicle_id)}"
+        style="padding:8px 14px;border:1px solid #d9d9d9;border-radius:20px;background:#f7f7f7;font-size:14px;cursor:pointer;">
+        ${escapeHtml(model.label)}
+      </button>
+    `).join('');
+
+    container.querySelectorAll('.model-pill').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        container.querySelectorAll('.model-pill').forEach(b => {
+          b.style.background = '#f7f7f7';
+          b.style.borderColor = '#d9d9d9';
+          b.style.color = '#222';
+        });
+
+        btn.style.background = '#F72616';
+        btn.style.borderColor = '#F72616';
+        btn.style.color = '#fff';
+
+        const vehicleId = btn.dataset.vehicleId;
+        selectedVehicleId = vehicleId;
+
+        const selectedModelBox = document.getElementById('selectedModelBox');
+        if (selectedModelBox) {
+          selectedModelBox.style.display = 'block';
+          selectedModelBox.textContent = `Избран модел: ${btn.textContent}`;
+        }
+
+        await loadCategoryTree(brandKey, vehicleId);
+      });
+    });
+
+  } catch (err) {
+    console.error('Грешка при зареждане на моделите:', err);
+    container.innerHTML = '<p>Възникна грешка при зареждане на моделите.</p>';
+  }
+}
+
+function renderCategoryTree(tree, brandKey) {
+  const container = document.getElementById('categoriesContainer');
+  if (!container) return;
+
+  const blocks = [];
+
+  Object.entries(tree || {}).forEach(([l1, l2Map]) => {
+    let html = `<div style="margin-bottom:18px;">`;
+
+    if (l1) {
+      html += `<h3 style="margin-bottom:10px;">${escapeHtml(slugToTitle(l1))}</h3>`;
+    }
+
+    Object.entries(l2Map || {}).forEach(([l2, l3Map]) => {
+      html += `
+        <div style="margin:10px 0 14px;">
+          <div style="font-weight:bold;margin-bottom:8px;">${escapeHtml(slugToTitle(l2))}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      `;
+
+      Object.entries(l3Map || {}).forEach(([l3, l4List]) => {
+        html += `
+          <button
+            type="button"
+            class="category-pill"
+            data-l2="${escapeHtml(l2)}"
+            data-l3="${escapeHtml(l3)}"
+            style="padding:7px 12px;border:1px solid #ddd;border-radius:18px;background:#fafafa;display:inline-block;cursor:pointer;">
+            ${escapeHtml(slugToTitle(l3 || l2))}
+          </button>
+        `;
+      });
+
+      html += `</div></div>`;
+    });
+
+    html += `</div>`;
+    blocks.push(html);
+  });
+
+  container.innerHTML = blocks.length
+    ? blocks.join('')
+    : '<p>Няма налични категории за този модел.</p>';
+
+  const buttons = container.querySelectorAll('.category-pill');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => {
+        b.style.background = '#fafafa';
+        b.style.borderColor = '#ddd';
+        b.style.color = '#222';
+      });
+
+      btn.style.background = '#111';
+      btn.style.borderColor = '#111';
+      btn.style.color = '#fff';
+
+      loadProducts(
+        brandKey,
+        selectedVehicleId,
+        btn.dataset.l2,
+        btn.dataset.l3
+      );
+    });
+  });
+}
+
+
+
+async function loadCategoryTree(brandKey, vehicleId) {
+  const container = document.getElementById('categoriesContainer');
+  const productsContainer = document.getElementById('productsContainer');
+
+  if (!container) return;
+
+  container.innerHTML = '<p>Зареждане на категории...</p>';
+
+  if (productsContainer) {
+    productsContainer.innerHTML = '';
+  }
+
+  try {
+    const res = await fetch(
+      `${CATALOG_API_BASE}/category-tree?brand=${encodeURIComponent(brandKey)}&vehicle_id=${encodeURIComponent(vehicleId)}`
+    );
+    const data = await res.json();
+    renderCategoryTree(data.tree, brandKey);
+  } catch (err) {
+    console.error('Грешка при зареждане на категориите:', err);
+    container.innerHTML = '<p>Възникна грешка при зареждане на категориите.</p>';
+  }
+}
+
+function loadProducts(brandKey, vehicleId, categoryL2, categoryL3) {
+  const container = document.getElementById('productsContainer');
+  if (!container) return;
+
+  container.innerHTML = '<p>Зареждане на продукти...</p>';
+
+  const params = new URLSearchParams({
+    brand: brandKey,
+    vehicle_id: vehicleId,
+    category_l2: categoryL2,
+    category_l3: categoryL3,
+    has_price_only: '1',
+    in_stock_only: '1',
+    sort: 'price_asc',
+    limit: '24'
+  });
+
+  fetch(`${CATALOG_API_BASE}/products?${params.toString()}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.products || !data.products.length) {
+        container.innerHTML = '<p>Няма намерени продукти в тази категория.</p>';
+        return;
+      }
+
+      container.innerHTML = data.products.map(product => {
+        const priceText = product.price_eur !== null && product.price_eur !== undefined
+          ? `${product.price_eur} €`
+          : 'Цена при запитване';
+
+        const deliveryText = product.delivery_text
+          ? escapeHtml(product.delivery_text)
+          : '';
+
+        const stockText = product.is_in_stock ? 'Налична' : 'Няма наличност';
+        const stockColor = product.is_in_stock ? 'green' : '#999';
+
+        const oeHtml = Array.isArray(product.oe_numbers) && product.oe_numbers.length
+          ? `<div style="font-size:12px;color:#666;margin-bottom:10px;">OE: ${product.oe_numbers.map(escapeHtml).join(', ')}</div>`
+          : '';
+
+        return `
+          <div style="border:1px solid #e5e5e5;border-radius:12px;padding:14px;background:#fff;">
+            <div style="width:100%;aspect-ratio:4/3;background:#f2f2f2;border-radius:10px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;color:#888;font-size:13px;">
+              Снимка скоро
+            </div>
+
+            <div style="font-weight:bold;line-height:1.5;margin-bottom:8px;">
+              ${escapeHtml(product.name)}
+            </div>
+
+            <div style="font-size:14px;color:#333;margin-bottom:6px;">
+              ${priceText}
+            </div>
+
+            <div style="font-size:13px;color:#555;margin-bottom:6px;">
+              ${deliveryText}
+            </div>
+
+            <div style="font-size:13px;color:${stockColor};margin-bottom:8px;">
+              ${stockText}
+            </div>
+
+            ${oeHtml}
+
+            <a href="/product_new.html?id=${encodeURIComponent(product.public_id || product.id)}"
+              style="display:inline-block;padding:8px 12px;background:#F72616;color:#fff;border-radius:8px;text-decoration:none;">
+              Виж продукта
+            </a>
+          </div>
+        `;
+      }).join('');
+    })
+    .catch(err => {
+      console.error('Грешка при зареждане на продуктите:', err);
+      container.innerHTML = '<p>Възникна грешка при зареждане на продуктите.</p>';
+    });
+}
+</script>
+
+<script>
 const brandConfig = {
   bmw: {
     name: 'BMW',
@@ -409,6 +726,7 @@ function buildBrandPage() {
     ctaBtn.href = '/';
     ctaBtn.textContent = `🔎 Търси части за ${brand.name}`;
   }
+  loadBrandModels(brandKey);
 }
 
 buildBrandPage();
