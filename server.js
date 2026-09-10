@@ -191,7 +191,6 @@ app.get('/search-session', (req, res) => {
 });
 
 const { registerUser, loginUser } = require('./auth');
-app.use(express.json());
 app.post('/api/register', registerUser);
 app.post('/api/login', loginUser);
 
@@ -1360,6 +1359,14 @@ ${messageItems}
   }
 
   res.status(200).send();
+});
+
+app.use((req, res, next) => {
+  if (req.originalUrl === '/webhook') {
+    return next();
+  }
+
+  express.json()(req, res, next);
 });
 
 const PORT = process.env.PORT || 3000;
