@@ -5,15 +5,39 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Преглед на авточаст – YouPart</title>
+  <title>Авточасти втора употреба – YouPart</title>
 
-  <!-- Ще се попълни от сървъра с реалния URL на продукта -->
-  <link rel="canonical" href="{{CANONICAL_URL}}">
+  <!-- Canonical -->
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
 
-  <!-- Този description може да остане, OG описанието идва от сървъра -->
-  <meta name="description" content="Детайлна информация за избраната авточаст. Виж цена, снимки, доставка и лесен начин за поръчка с доставка до България.">
+      if (!id) return;
 
-  <!-- Тук СЪРВЪРЪТ ще инжектира OG + Twitter тагове за конкретния продукт -->
+      const canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      canonical.href =
+        'https://www.youpart.net/product.html?id=' + encodeURIComponent(id);
+
+      document.head.appendChild(canonical);
+    })();
+  </script>
+
+  <!-- SEO -->
+  <meta name="description" content="Авточаст втора употреба с доставка до България. Виж цена, снимки и информация за съвместимост.">
+
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Авточаст втора употреба – YouPart">
+  <meta property="og:description" content="Авточасти от Европа, Англия и САЩ с доставка до България.">
+  <meta property="og:type" content="product">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Dynamic OG от сървъра -->
   <!--OG_DYNAMIC-->
 
   <link rel="stylesheet" href="style.css">
@@ -91,27 +115,63 @@
   <div class="price-section">
     <p><strong>Цена:</strong></p>
     <div class="dual-price" id="price-block">
-      <span id="price">—</span>
-      <span id="priceEUR"></span>
+      <span id="priceEUR">—</span>
     </div>
-
   </div>
   
   <div class="product-description" id="description"></div>
+
+  <div class="item-specifics-section">
+    <h2>Данни за частта</h2>
+    <div id="item-specifics"></div>
+  </div>
 </div>
 
-
-      
-      <div class="action-buttons">
+<div class="action-buttons">
   <button class="btn btn-secondary" onclick="goBackToResults()">← Назад към резултатите</button>
   
   <div class="cart-delivery-group">
     <button class="btn btn-primary" id="addToCartBtn">Добави в количката</button>
     <a href="delivery-returns.html" class="delivery-info-link">
-  📦 <span>Калкулатор доставка</span>
-</a>
-
+      📦 <span>Калкулатор доставка</span>
+    </a>
   </div>
+</div>
+
+<div style="margin-top:24px; padding:18px 20px; border:1px solid #e5e5e5; border-radius:10px; background:#fafafa;">
+  <h2 style="margin:0 0 12px 0; font-size:20px;">Поръчка и доставка</h2>
+
+  <p style="margin:0 0 10px 0; line-height:1.5;">
+    Тази авточаст може да бъде поръчана онлайн с доставка до България. YouPart предлага части от Европа, Англия и САЩ.
+  </p>
+
+  <p style="margin:0 0 10px 0; line-height:1.5;">
+    Ако не сте сигурни дали частта е съвместима с вашия автомобил, проверете по OEM номер, модел, година и модификация.
+  </p>
+
+  <p style="margin:0; line-height:1.5;">
+    За ориентировъчна цена и срок на доставка вижте
+    <a href="delivery-returns.html" style="text-decoration:underline;">калкулатора за доставка</a>.
+  </p>
+</div>
+
+<div style="margin-top:24px;">
+  <h2 style="font-size:20px; margin:0 0 12px 0;">Често задавани въпроси</h2>
+
+  <details style="margin-bottom:10px;">
+    <summary>Доставяте ли тази част до България?</summary>
+    <p style="margin-top:8px;">Да, предлагаме доставка до България за авточасти от Европа, Англия и САЩ.</p>
+  </details>
+
+  <details style="margin-bottom:10px;">
+    <summary>Как да проверя дали частта е съвместима?</summary>
+    <p style="margin-top:8px;">Най-сигурният начин е проверка по OEM номер, модел, година и модификация на автомобила.</p>
+  </details>
+
+  <details style="margin-bottom:10px;">
+    <summary>Колко време отнема доставката?</summary>
+    <p style="margin-top:8px;">Срокът зависи от държавата на изпращане и избрания транспорт. За повече информация вижте страницата за доставка.</p>
+  </details>
 </div>
 
       <p class="success-message" id="successMsg">
@@ -136,18 +196,73 @@
     const urlParams = new URLSearchParams(window.location.search);
     const itemId = urlParams.get('id');
     const title = decodeURIComponent(urlParams.get('title') || '');
-    const price = decodeURIComponent(urlParams.get('priceBGN') || '—');
+    const customPriceEUR = urlParams.get('customPriceEUR');
 
     async function loadProduct() {
       try {
-        const res = await fetch(`/product?id=${encodeURIComponent(itemId)}&title=${encodeURIComponent(title)}&priceBGN=${encodeURIComponent(price)}`);
+        let productUrl =
+          `/product?id=${encodeURIComponent(itemId)}` +
+          `&title=${encodeURIComponent(title)}`;
+
+        if (customPriceEUR) {
+          productUrl += `&customPriceEUR=${encodeURIComponent(customPriceEUR)}`;
+        }
+
+        const res = await fetch(productUrl);
         const data = await res.json();
 
         // Показваме заглавието от URL параметъра или от данните
         const displayTitle = title || data.title || 'Продукт';
         document.getElementById('title').textContent = displayTitle;
 
-        document.getElementById('price').textContent = `${data.price} лв.`;
+        document.title = `${displayTitle} – авточаст втора употреба | YouPart`;
+
+        const metaDescription = document.querySelector('meta[name="description"]');
+        if (metaDescription) {
+          metaDescription.setAttribute(
+            'content',
+            `${displayTitle} – авточаст втора употреба с доставка до България. Вижте снимки, цена и информация за поръчка в YouPart.`
+          );
+        }
+
+        const ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) {
+          ogTitle.setAttribute('content', `${displayTitle} – YouPart`);
+        }
+
+        const ogDescription = document.querySelector('meta[property="og:description"]');
+        if (ogDescription) {
+          ogDescription.setAttribute(
+            'content',
+            `${displayTitle} – авточаст втора употреба от Европа, Англия или САЩ с доставка до България.`
+          );
+        }
+
+        // ✅ Product schema
+        const oldSchema = document.getElementById('product-schema');
+        if (oldSchema) oldSchema.remove();
+
+        const schema = {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": displayTitle,
+          "image": data.images || [],
+          "description": data.description || `${displayTitle} – авточаст втора употреба`,
+          "offers": {
+            "@type": "Offer",
+            "priceCurrency": "EUR",
+            "price": data.priceEUR || "",
+            "availability": "https://schema.org/InStock",
+            "url": window.location.href
+          }
+        };
+
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.id = 'product-schema';
+        script.textContent = JSON.stringify(schema);
+        document.head.appendChild(script);
+
         if (data.priceEUR) {
           document.getElementById('priceEUR').textContent = `${data.priceEUR} €`;
         }
@@ -157,6 +272,29 @@
           document.getElementById('description').textContent = data.description;
         } else {
           document.getElementById('description').textContent = "Няма допълнително описание за този продукт.";
+        }
+
+        if (data.localizedAspects && data.localizedAspects.length > 0) {
+          const specificsContainer = document.getElementById('item-specifics');
+
+          if (specificsContainer) {
+            specificsContainer.innerHTML = '';
+
+            data.localizedAspects.forEach(aspect => {
+              const row = document.createElement('div');
+              row.className = 'specific-row';
+
+              const label = document.createElement('strong');
+              label.textContent = aspect.name + ': ';
+
+              const value = document.createElement('span');
+              value.textContent = aspect.value;
+
+              row.appendChild(label);
+              row.appendChild(value);
+              specificsContainer.appendChild(row);
+            });
+          }
         }
 
         document.getElementById('ebayLink').href = data.ebayLink || '#';
@@ -177,7 +315,6 @@
           const product = {
             itemId: itemId,
             title: displayTitle,
-            priceBGN: data.price,
             priceEUR: data.priceEUR,
             ebayLink: data.ebayLink,
             image: data.images && data.images.length > 0 ? data.images[0] : ''

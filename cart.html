@@ -81,20 +81,21 @@
     <div class="cart-summary">
       <div class="cart-summary-row">
         <span>Продукти:</span>
-        <span id="productTotal">0.00 лв.</span>
+        <span id="productTotal">0.00 €</span>
       </div>
+
       <div class="cart-summary-row">
         <span>Допълнителна сума:</span>
-        <span id="extraTotal">0.00 лв.</span>
+        <span id="extraTotal">0.00 €</span>
       </div>
-      <div class="cart-summary-row">
+
+      <div class="cart-summary-row cart-summary-total">
         <span>Общо (EUR):</span>
         <span id="finalTotalEUR">0.00 €</span>
       </div>
-      <div class="cart-summary-row cart-summary-total">
-        <span>Общо (BGN):</span>
-        <span id="finalTotal">0.00 лв.</span>
-      </div>
+
+      <!-- Оставяме го скрит, защото JavaScript все още го използва -->
+      <span id="finalTotal" style="display:none;"></span>
     </div>
 
 <div class="cart-bottom-bar mobile-center">
@@ -222,8 +223,8 @@
 <div class="cart-item-details">
   <h3 class="cart-item-title">${item.title}</h3>
   <div class="cart-item-price dual-price">
-  <span>${item.priceBGN} лв.</span>
-  <span>(${item.priceEUR} €)</span>
+    <span>${item.priceEUR} €</span>
+  </div>
 </div>
 
   
@@ -243,18 +244,29 @@
       });
 
       // Изчисляване на сумите
-  const productTotal = cartItems.reduce((sum, item) => sum + parseFloat(item.priceBGN || 0), 0);
-  const productTotalEUR = cartItems.reduce((sum, item) => sum + parseFloat(item.priceEUR || 0), 0);
-  const extraBGN = parseInt(document.getElementById('extraBGN')?.value || 0);
-  const extraSt = parseInt(document.getElementById('extraSt')?.value || 0);
-  const extraTotal = extraBGN + (extraSt / 100);
-  const finalTotal = productTotal + extraTotal;
-  const finalTotalEUR = productTotalEUR + (extraTotal / 1.95583); // Конвертиране на допълнителната сума от BGN към EUR
+  // Изчисляване на сумите в EUR
+  const productTotal = cartItems.reduce(
+    (sum, item) => sum + parseFloat(item.priceEUR || 0),
+    0
+  );
 
-  document.getElementById('productTotal').textContent = productTotal.toFixed(2) + ' лв.';
-  document.getElementById('extraTotal').textContent = extraTotal.toFixed(2) + ' лв.';
-  document.getElementById('finalTotal').textContent = finalTotal.toFixed(2) + ' лв.';
-  document.getElementById('finalTotalEUR').textContent = finalTotalEUR.toFixed(2) + ' €';
+  const extraEUR = parseInt(document.getElementById('extraBGN')?.value || 0);
+  const extraCents = parseInt(document.getElementById('extraSt')?.value || 0);
+
+  const extraTotal = extraEUR + (extraCents / 100);
+  const finalTotalEUR = productTotal + extraTotal;
+
+  document.getElementById('productTotal').textContent =
+    productTotal.toFixed(2) + ' €';
+
+  document.getElementById('extraTotal').textContent =
+    extraTotal.toFixed(2) + ' €';
+
+  document.getElementById('finalTotalEUR').textContent =
+    finalTotalEUR.toFixed(2) + ' €';
+
+  document.getElementById('finalTotal').textContent =
+    finalTotalEUR.toFixed(2) + ' €';
 }
 
     document.getElementById('extraBGN')?.addEventListener('input', renderCart);
@@ -284,18 +296,28 @@ function showCheckout() {
     }
     
 function updateTotals() {
-  const productTotal = cartItems.reduce((sum, item) => sum + parseFloat(item.priceBGN || 0), 0);
-  const productTotalEUR = cartItems.reduce((sum, item) => sum + parseFloat(item.priceEUR || 0), 0);
-  const extraBGN = parseInt(document.getElementById('extraBGN')?.value || 0);
-  const extraSt = parseInt(document.getElementById('extraSt')?.value || 0);
-  const extraTotal = extraBGN + (extraSt / 100);
-  const finalTotal = productTotal + extraTotal;
-  const finalTotalEUR = productTotalEUR + (extraTotal / 1.95583);
+  const productTotal = cartItems.reduce(
+    (sum, item) => sum + parseFloat(item.priceEUR || 0),
+    0
+  );
 
-  document.getElementById('productTotal').textContent = productTotal.toFixed(2) + ' лв.';
-  document.getElementById('extraTotal').textContent = extraTotal.toFixed(2) + ' лв.';
-  document.getElementById('finalTotal').textContent = finalTotal.toFixed(2) + ' лв.';
-  document.getElementById('finalTotalEUR').textContent = finalTotalEUR.toFixed(2) + ' €';
+  const extraEUR = parseInt(document.getElementById('extraBGN')?.value || 0);
+  const extraCents = parseInt(document.getElementById('extraSt')?.value || 0);
+
+  const extraTotal = extraEUR + (extraCents / 100);
+  const finalTotalEUR = productTotal + extraTotal;
+
+  document.getElementById('productTotal').textContent =
+    productTotal.toFixed(2) + ' €';
+
+  document.getElementById('extraTotal').textContent =
+    extraTotal.toFixed(2) + ' €';
+
+  document.getElementById('finalTotalEUR').textContent =
+    finalTotalEUR.toFixed(2) + ' €';
+
+  document.getElementById('finalTotal').textContent =
+    finalTotalEUR.toFixed(2) + ' €';
 }
 
 

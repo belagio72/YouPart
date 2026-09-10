@@ -57,7 +57,7 @@
   <div id="ebay-section" style="margin-top: 20px; padding: 15px; background: #f8f8f8; border-radius: 12px; border: 1px solid #ccc;">
     <h3>🎯 Създай линк към продукт от eBay</h3>
     <input type="text" id="ebayInput" placeholder="Постави eBay линк тук" style="width: 50%; padding: 8px;">
-    <input type="number" id="customPrice" placeholder="Цена с надценка (BGN)" style="width: 20%; padding: 8px; margin-left: 10px;">
+    <input type="number" id="customPrice" placeholder="Крайна цена (EUR)" style="width: 20%; padding: 8px; margin-left: 10px;">
     <button onclick="generateResolvedLink()" style="margin-left: 10px;">Генерирай линк</button>
     <div id="resultLink" style="margin-top: 10px;"></div>
   </div>
@@ -210,15 +210,15 @@ async function fetchOrders() {
     const itemsHtml = order.items.map(item => `
       <div class="order-item">
         <p><strong>Продукт:</strong> ${item.title || '—'}</p>
-        <p><strong>Цена:</strong> ${item.priceBGN || '—'} лв. (${item.priceEUR || '—'} €)</p>
+        <p><strong>Цена:</strong> ${item.priceEUR || '—'} €</p>
         <p><strong>eBay линк:</strong> <a href="${item.ebayLink}" target="_blank">${item.ebayLink || '—'}</a></p>
         ${item.productLink ? `<p><strong>Линк в сайта:</strong> <a href="${item.productLink}" target="_blank">${item.productLink}</a></p>` : ''}
         
         <!-- КОРИГИРАН ЛИНК С ДОБАВЕН ПАРАМЕТЪР ЗА ЦЕНАТА -->
         ${item.itemId ? `
           <p><strong>Линк в нашия сайт:</strong> 
-            <a href="/product.html?id=${item.itemId}&priceBGN=${item.priceBGN}" target="_blank">
-              /product.html?id=${item.itemId}&priceBGN=${item.priceBGN}
+            <a href="/product.html?id=${encodeURIComponent(item.itemId)}" target="_blank">
+              /product.html?id=${encodeURIComponent(item.itemId)}
             </a>
           </p>
         ` : ''}
@@ -356,15 +356,15 @@ async function fetchArchive() {
       const itemsHtml = (order.items || []).map(item => `
         <div class="order-item">
           <p><strong>Продукт:</strong> ${item.title || '—'}</p>
-          <p><strong>Цена:</strong> ${item.priceBGN || '—'} лв.</p>
+          <p><strong>Цена:</strong> ${item.priceEUR || '—'} €</p>
           <p><strong>eBay линк:</strong> <a href="${item.ebayLink || '#'}" target="_blank">${item.ebayLink || '—'}</a></p>
           ${item.productLink ? `<p><strong>Линк в сайта:</strong> <a href="${item.productLink}" target="_blank">${item.productLink}</a></p>` : ''}
           
           <!-- КОРИГИРАН ЛИНК С ДОБАВЕН ПАРАМЕТЪР ЗА ЦЕНАТА -->
           ${item.itemId ? `
             <p><strong>Линк в нашия сайт:</strong> 
-              <a href="/product.html?id=${item.itemId}&priceBGN=${item.priceBGN}" target="_blank">
-                /product.html?id=${item.itemId}&priceBGN=${item.priceBGN}
+              <a href="/product.html?id=${encodeURIComponent(item.itemId)}" target="_blank">
+                /product.html?id=${encodeURIComponent(item.itemId)}
               </a>
             </p>
           ` : ''}
@@ -387,6 +387,7 @@ async function fetchArchive() {
       `;
       container.appendChild(div);
     });
+
   } catch (err) {
     console.error('Грешка при зареждане на архива:', err);
     container.innerHTML = '⚠️ Грешка при зареждане на архива.';
@@ -419,10 +420,21 @@ function generateResolvedLink() {
         return;
       }
 
-      const { itemId, title, priceBGN, query, region } = data;
-      const finalPrice = !isNaN(customPrice) ? customPrice.toFixed(2) : priceBGN;
+      const { itemId, title, query, region } = data;
 
-      const finalUrl = `product.html?id=${encodeURIComponent(itemId)}&title=${encodeURIComponent(title)}&priceBGN=${finalPrice}&query=${encodeURIComponent(query)}&region=${region}`;
+      if (isNaN(customPrice) || customPrice <= 0) {
+        alert('❌ Въведи крайна цена в EUR.');
+        return;
+      }
+
+      const finalPrice = customPrice.toFixed(2);
+
+      const finalUrl =
+        `product.html?id=${encodeURIComponent(itemId)}` +
+        `&title=${encodeURIComponent(title)}` +
+        `&customPriceEUR=${encodeURIComponent(finalPrice)}` +
+        `&query=${encodeURIComponent(query)}` +
+        `&region=${encodeURIComponent(region)}`;
       const fullUrl = `${window.location.origin}/${finalUrl}`;
 
       document.getElementById('resultLink').innerHTML = `
