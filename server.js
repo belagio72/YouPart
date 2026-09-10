@@ -140,6 +140,141 @@ const TELEGRAM_URL = `https://api.telegram.org/bot${telegramBotToken}/sendMessag
 
 const app = express();
 
+app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      endpointSecret
+    );
+  } catch (err) {
+    console.error(
+      '❌ Stripe Webhook грешка при валидация:',
+      err.message
+    );
+
+    return res.status(400).send(
+      `Webhook Error: ${err.message}`
+    );
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const orderNumber = session.client_reference_id;
+
+    console.log(
+      '✅ Checkout completed за поръчка:',
+      orderNumber
+    );
+
+    if (orderNumber && session.payment_status === 'paid') {
+      try {
+        const orders = readOrders();
+
+        const orderIndex = orders.findIndex(
+          order =>
+            Number(order.orderNumber) === Number(orderNumber)
+        );
+
+        if (orderIndex === -1) {
+          console.error(
+            `❌ Поръчка ${orderNumber} не е намерена.`
+          );
+        } else {
+          const order = orders[orderIndex];
+
+          // Защита от повторно изпращане
+          if (order.paymentStatus !== 'платена') {
+            order.paymentStatus = 'платена';
+            order.paid = true;
+
+            orders[orderIndex] = order;
+
+            fs.writeFileSync(
+              ordersPath,
+              JSON.stringify(orders, null, 2)
+            );
+
+            console.log(
+              `💾 Поръчка ${orderNumber} е отбелязана като платена.`
+            );
+
+            // Имейл към клиента
+            await sendConfirmationEmail(order);
+
+            // Telegram известие
+            const messageItems = (order.items || []).map((item, index) => {
+              const youpartLink = item.itemId
+                ? `https://www.youpart.net/product.html?id=${encodeURIComponent(item.itemId)}`
+                : 'няма';
+
+              return `
+🔹 Продукт ${index + 1}:
+📦 ${item.title || 'неизвестен'}
+💰 ${item.priceEUR || '??'} €
+🔗 eBay: ${item.ebayLink || 'няма'}
+🔗 YouPart: ${youpartLink}`;
+            }).join('\n');
+
+            const message = `
+✅ ПЛАТЕНА ПОРЪЧКА #${order.orderNumber}
+👤 Име: ${order.name}
+📧 Имейл: ${order.email}
+📞 Телефон: ${order.phone}
+🏠 Адрес: ${order.address}
+
+${messageItems}
+`;
+
+            const telegramUrl =
+              `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
+
+            try {
+              await axios.post(telegramUrl, {
+                chat_id: telegramChatId,
+                text: message
+              });
+
+              console.log(
+                `📲 Telegram известие изпратено за поръчка ${orderNumber}.`
+              );
+            } catch (err) {
+              console.error(
+                '❌ Неуспешно изпращане към Telegram:',
+                err.message
+              );
+            }
+
+          } else {
+            console.log(
+              `ℹ️ Поръчка ${orderNumber} вече е обработена като платена.`
+            );
+          }
+        }
+
+      } catch (err) {
+        console.error(
+          '❌ Грешка при обработка на платена поръчка:',
+          err
+        );
+      }
+    } else {
+      console.log(
+        `ℹ️ Checkout приключи, но плащането не е paid. Поръчка: ${orderNumber}`
+      );
+    }
+  }
+
+  res.status(200).send();
+});
+
+// JSON за всички останали routes
+app.use(express.json());
+
 app.use((req, res, next) => {
   const host = req.get('host');
 
@@ -292,14 +427,6 @@ if (fs.existsSync(MESSAGES_FILE)) {
   }
 }
 
-app.use((req, res, next) => {
-  if (req.originalUrl === '/webhook') {
-    next();
-  } else {
-    express.json()(req, res, next);
-  }
-});
-
 const searchLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 минута
   max: 20, // до 20 search заявки на IP за минута
@@ -315,8 +442,6 @@ const contactLimiter = rateLimit({
 });
 
 
-
-app.use('/webhook', express.raw({ type: 'application/json' }));
 app.use(cookieParser());
 app.use(express.static(__dirname));
 
@@ -1227,138 +1352,6 @@ app.post('/create-checkout-session', checkoutLimiter, async (req, res) => {
     console.error('❌ Stripe session error:', err);
     res.status(500).json({ error: 'Stripe session creation failed' });
   }
-});
-
-app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-
-  let event;
-
-  try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      endpointSecret
-    );
-  } catch (err) {
-    console.error(
-      '❌ Stripe Webhook грешка при валидация:',
-      err.message
-    );
-
-    return res.status(400).send(
-      `Webhook Error: ${err.message}`
-    );
-  }
-
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    const orderNumber = session.client_reference_id;
-
-    console.log(
-      '✅ Checkout completed за поръчка:',
-      orderNumber
-    );
-
-    if (orderNumber && session.payment_status === 'paid') {
-      try {
-        const orders = readOrders();
-
-        const orderIndex = orders.findIndex(
-          order =>
-            Number(order.orderNumber) === Number(orderNumber)
-        );
-
-        if (orderIndex === -1) {
-          console.error(
-            `❌ Поръчка ${orderNumber} не е намерена.`
-          );
-        } else {
-          const order = orders[orderIndex];
-
-          // Защита от повторно изпращане
-          if (order.paymentStatus !== 'платена') {
-            order.paymentStatus = 'платена';
-            order.paid = true;
-
-            orders[orderIndex] = order;
-
-            fs.writeFileSync(
-              ordersPath,
-              JSON.stringify(orders, null, 2)
-            );
-
-            console.log(
-              `💾 Поръчка ${orderNumber} е отбелязана като платена.`
-            );
-
-            // Имейл към клиента
-            await sendConfirmationEmail(order);
-
-            // Telegram известие
-            const messageItems = (order.items || []).map((item, index) => {
-              const youpartLink = item.itemId
-                ? `https://www.youpart.net/product.html?id=${encodeURIComponent(item.itemId)}`
-                : 'няма';
-
-              return `
-🔹 Продукт ${index + 1}:
-📦 ${item.title || 'неизвестен'}
-💰 ${item.priceEUR || '??'} €
-🔗 eBay: ${item.ebayLink || 'няма'}
-🔗 YouPart: ${youpartLink}`;
-            }).join('\n');
-
-            const message = `
-✅ ПЛАТЕНА ПОРЪЧКА #${order.orderNumber}
-👤 Име: ${order.name}
-📧 Имейл: ${order.email}
-📞 Телефон: ${order.phone}
-🏠 Адрес: ${order.address}
-
-${messageItems}
-`;
-
-            const telegramUrl =
-              `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
-
-            try {
-              await axios.post(telegramUrl, {
-                chat_id: telegramChatId,
-                text: message
-              });
-
-              console.log(
-                `📲 Telegram известие изпратено за поръчка ${orderNumber}.`
-              );
-            } catch (err) {
-              console.error(
-                '❌ Неуспешно изпращане към Telegram:',
-                err.message
-              );
-            }
-
-          } else {
-            console.log(
-              `ℹ️ Поръчка ${orderNumber} вече е обработена като платена.`
-            );
-          }
-        }
-
-      } catch (err) {
-        console.error(
-          '❌ Грешка при обработка на платена поръчка:',
-          err
-        );
-      }
-    } else {
-      console.log(
-        `ℹ️ Checkout приключи, но плащането не е paid. Поръчка: ${orderNumber}`
-      );
-    }
-  }
-
-  res.status(200).send();
 });
 
 
