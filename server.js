@@ -143,6 +143,18 @@ const app = express();
 app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   const sig = req.headers['stripe-signature'];
 
+    // 🔍 DEBUG ЛОГОВЕ — сложи ги ТУК, преди constructEvent
+  console.log('🔍 ===== WEBHOOK DEBUG =====');
+  console.log('  sig header:', sig ? sig.substring(0, 40) + '...' : 'MISSING');
+  console.log('  secret:', endpointSecret
+    ? endpointSecret.substring(0, 12) + '...' + endpointSecret.slice(-4)
+    : 'MISSING');
+  console.log('  body is Buffer:', Buffer.isBuffer(req.body));
+  console.log('  body length:', req.body?.length);
+  console.log('  body first 100:', req.body?.toString().substring(0, 100));
+  console.log('  content-type:', req.headers['content-type']);
+  console.log('  ============================');
+
   let event;
 
   try {
