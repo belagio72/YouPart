@@ -577,12 +577,15 @@ async function sendConfirmationEmail(order) {
     const template = JSON.parse(templateRaw);
 
     const extra = parseFloat(order.extraCharge) || 0;
+
     const productList = order.items.map(item => 
-      `🔹 ${item.title}\n💰 ${item.priceBGN} лв. / ${item.priceEUR} €\n`
+      `🔹 ${item.title}\n💰 ${parseFloat(item.priceEUR || 0).toFixed(2)} €\n`
     ).join('\n');
 
-    const totalAmount = order.items.reduce((sum, item) => 
-      sum + parseFloat(item.priceBGN), 0) + extra;
+    const totalAmount = order.items.reduce(
+      (sum, item) => sum + parseFloat(item.priceEUR || 0),
+      0
+    ) + extra;
 
     const emailBody = template.body
       .replace('{{name}}', order.name)
@@ -617,42 +620,8 @@ app.post('/order', async (req, res) => {
     archived: false
   };
 
-  const messageItems = (order.items || []).map((item, index) => {
-  const youpartLink = item.itemId && item.priceBGN
-    ? `https://www.youpart.net/product.html?id=${item.itemId}&priceBGN=${item.priceBGN}`
-    : 'няма'; 
-
-  return `
-🔹 Продукт ${index + 1}:
-📦 ${item.title || 'неизвестен'}
-💰 ${item.priceBGN || '??'} лв. (${item.priceEUR || '??'} €)
-🔗 eBay: ${item.ebayLink || 'няма'}
-🔗 YouPart: ${youpartLink}`;
-}).join('\n');
-
-
-  // Телеграм съобщение
-  const message = `
-🛒 НОВА ПОРЪЧКА #${order.orderNumber}:
-👤 Име: ${order.name}
-📧 Имейл: ${order.email}
-📞 Телефон: ${order.phone}
-🏠 Адрес: ${order.address}
-${messageItems}
-`;
-
-  const telegramUrl = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
   try {
-    await axios.post(telegramUrl, {
-      chat_id: telegramChatId,
-      text: message
-    });
-  } catch (err) {
-    console.error('❌ Неуспешно изпращане към Telegram:', err.message);
-  }
-
-  try {
-    let orders = readOrders();
+    const orders = readOrders();
 
     const newOrder = {
       ...order,
@@ -660,15 +629,31 @@ ${messageItems}
     };
 
     orders.push(newOrder);
-    fs.writeFileSync(ordersPath, JSON.stringify(orders, null, 2));
-    console.log('📦 Записана поръчка:', order);
-    await sendConfirmationEmail(order);
 
-    res.json({ success: true, orderNumber: order.orderNumber });
+    fs.writeFileSync(
+      ordersPath,
+      JSON.stringify(orders, null, 2)
+    );
+
+    console.log(
+      '📦 Записана неплатена поръчка:',
+      order.orderNumber
+    );
+
+    res.json({
+      success: true,
+      orderNumber: order.orderNumber
+    });
 
   } catch (err) {
-    console.error('❌ Грешка при запис в orders.json:', err);
-    res.status(500).json({ success: false });
+    console.error(
+      '❌ Грешка при запис в orders.json:',
+      err
+    );
+
+    res.status(500).json({
+      success: false
+    });
   }
 });
 
@@ -875,19 +860,16 @@ app.get('/search', searchLimiter, async (req, res) => {
         const totalPrice = priceValue + shippingCost;
         const currency = item.price.currency;
 
-        let priceBGN = '—';
         let priceEUR = '—';
 
         if (currency === 'USD') {
-          priceBGN = (totalPrice * exchangeRates.BGN * markup).toFixed(2);
           priceEUR = (totalPrice * exchangeRates.EUR * markup).toFixed(2);
+
         } else if (currency === 'EUR') {
           priceEUR = (totalPrice * markup).toFixed(2);
-          priceBGN = (totalPrice * (exchangeRates.BGN / exchangeRates.EUR) * markup).toFixed(2);
+
         } else if (currency === 'GBP') {
-          const gbpToBGN = exchangeRates.BGN / exchangeRates.GBP;
           const gbpToEUR = exchangeRates.EUR / exchangeRates.GBP;
-          priceBGN = (totalPrice * gbpToBGN * markup).toFixed(2);
           priceEUR = (totalPrice * gbpToEUR * markup).toFixed(2);
         }
 
@@ -909,7 +891,6 @@ if (translations[item.title]) {
           itemId: item.itemId,
           title: translatedTitle,
           image: item.image?.imageUrl || '',
-          priceBGN,
           priceEUR,
           currency,
           priceOriginal: priceValue.toFixed(2),
@@ -1049,16 +1030,42 @@ app.get('/product', async (req, res) => {
     });
 
     const item = ebayRes.data;
+
     const description = item.shortDescription || item.description || 'Няма описание';
     const title = item.title || 'Няма заглавие';
-    const priceBGN = req.query.priceBGN || '—';
-    const currency = req.query.currency || 'лв.';
+    const settings = loadSettings();
+    const markup = settings.markup || 1.2;
+
+    const ebayPrice = parseFloat(item?.price?.value) || 0;
+    const ebayCurrency = item?.price?.currency || '';
+
+    const customPriceEUR = parseFloat(req.query.customPriceEUR);
+
     let priceEUR = '—';
 
-    if (priceBGN !== '—' && exchangeRates.BGN && exchangeRates.EUR) {
-      const bgn = parseFloat(priceBGN.replace(',', '.'));
-      priceEUR = (bgn / exchangeRates.BGN * exchangeRates.EUR).toFixed(2);
+    if (!isNaN(customPriceEUR) && customPriceEUR > 0) {
+      // Ръчно зададена цена от admin генератора
+      priceEUR = customPriceEUR.toFixed(2);
+
+    } else if (ebayPrice > 0) {
+      // Нормален продукт – автоматична цена от eBay + markup
+      if (ebayCurrency === 'EUR') {
+        priceEUR = (ebayPrice * markup).toFixed(2);
+
+      } else if (ebayCurrency === 'USD' && exchangeRates.EUR) {
+        priceEUR = (ebayPrice * exchangeRates.EUR * markup).toFixed(2);
+
+      } else if (
+        ebayCurrency === 'GBP' &&
+        exchangeRates.EUR &&
+        exchangeRates.GBP
+      ) {
+        const gbpToEUR = exchangeRates.EUR / exchangeRates.GBP;
+        priceEUR = (ebayPrice * gbpToEUR * markup).toFixed(2);
+      }
     }
+
+const currency = 'EUR';
 
     const images = [];
     if (item.image?.imageUrl) images.push(item.image.imageUrl);
@@ -1070,12 +1077,12 @@ app.get('/product', async (req, res) => {
 
     res.json({
       title,
-      price: priceBGN,
       priceEUR,
       currency,
       images,
       ebayLink: item.itemWebUrl || '#',
-      description
+      description,
+      localizedAspects: item.localizedAspects || []
     });
 
   } catch (err) {
@@ -1083,9 +1090,8 @@ app.get('/product', async (req, res) => {
     res.status(500).json({ 
       error: 'Product fetch failed',
       title: req.query.title || 'Няма заглавие',
-      price: req.query.priceBGN || '—',
       priceEUR: '—',
-      currency: 'лв.',
+      currency: 'EUR',
       images: ['https://via.placeholder.com/300?text=No+Image'],
       ebayLink: '#',
       description: 'Няма налични данни за продукта'
@@ -1182,7 +1188,7 @@ app.post('/create-checkout-session', checkoutLimiter, async (req, res) => {
     // Сума на артикулите
     let total = 0;
     for (const item of items) {
-      const price = parseFloat(item.priceBGN);
+      const price = parseFloat(item.priceEUR);
       if (!isNaN(price)) total += price;
     }
 
@@ -1197,7 +1203,7 @@ app.post('/create-checkout-session', checkoutLimiter, async (req, res) => {
       line_items: [
         {
           price_data: {
-            currency: 'bgn',
+            currency: 'eur',
             product_data: {
               name: `Поръчка #${orderNumber}`
             },
@@ -1224,43 +1230,142 @@ app.post('/create-checkout-session', checkoutLimiter, async (req, res) => {
   }
 });
 
-app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   const sig = req.headers['stripe-signature'];
 
   let event;
+
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      endpointSecret
+    );
   } catch (err) {
-    console.error('❌ Stripe Webhook грешка при валидация:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    console.error(
+      '❌ Stripe Webhook грешка при валидация:',
+      err.message
+    );
+
+    return res.status(400).send(
+      `Webhook Error: ${err.message}`
+    );
   }
 
-if (event.type === 'checkout.session.completed') {
-  const session = event.data.object;
-  const orderNumber = session.client_reference_id; // ✅ вече правилно
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const orderNumber = session.client_reference_id;
 
-  console.log('✅ Успешно плащане за поръчка:', orderNumber);
+    console.log(
+      '✅ Checkout completed за поръчка:',
+      orderNumber
+    );
 
-  if (orderNumber) {
-    const orders = readOrders();
-    const updatedOrders = orders.map(order => {
-      if (Number(order.orderNumber) === Number(orderNumber)) {
-        return { ...order, paymentStatus: 'платена' };
+    if (orderNumber && session.payment_status === 'paid') {
+      try {
+        const orders = readOrders();
+
+        const orderIndex = orders.findIndex(
+          order =>
+            Number(order.orderNumber) === Number(orderNumber)
+        );
+
+        if (orderIndex === -1) {
+          console.error(
+            `❌ Поръчка ${orderNumber} не е намерена.`
+          );
+        } else {
+          const order = orders[orderIndex];
+
+          // Защита от повторно изпращане
+          if (order.paymentStatus !== 'платена') {
+            order.paymentStatus = 'платена';
+            order.paid = true;
+
+            orders[orderIndex] = order;
+
+            fs.writeFileSync(
+              ordersPath,
+              JSON.stringify(orders, null, 2)
+            );
+
+            console.log(
+              `💾 Поръчка ${orderNumber} е отбелязана като платена.`
+            );
+
+            // Имейл към клиента
+            await sendConfirmationEmail(order);
+
+            // Telegram известие
+            const messageItems = (order.items || []).map((item, index) => {
+              const youpartLink = item.itemId
+                ? `https://www.youpart.net/product.html?id=${encodeURIComponent(item.itemId)}`
+                : 'няма';
+
+              return `
+🔹 Продукт ${index + 1}:
+📦 ${item.title || 'неизвестен'}
+💰 ${item.priceEUR || '??'} €
+🔗 eBay: ${item.ebayLink || 'няма'}
+🔗 YouPart: ${youpartLink}`;
+            }).join('\n');
+
+            const message = `
+✅ ПЛАТЕНА ПОРЪЧКА #${order.orderNumber}
+👤 Име: ${order.name}
+📧 Имейл: ${order.email}
+📞 Телефон: ${order.phone}
+🏠 Адрес: ${order.address}
+
+${messageItems}
+`;
+
+            const telegramUrl =
+              `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
+
+            try {
+              await axios.post(telegramUrl, {
+                chat_id: telegramChatId,
+                text: message
+              });
+
+              console.log(
+                `📲 Telegram известие изпратено за поръчка ${orderNumber}.`
+              );
+            } catch (err) {
+              console.error(
+                '❌ Неуспешно изпращане към Telegram:',
+                err.message
+              );
+            }
+
+          } else {
+            console.log(
+              `ℹ️ Поръчка ${orderNumber} вече е обработена като платена.`
+            );
+          }
+        }
+
+      } catch (err) {
+        console.error(
+          '❌ Грешка при обработка на платена поръчка:',
+          err
+        );
       }
-      return order;
-    });
-
-    fs.writeFileSync(ordersPath, JSON.stringify(updatedOrders, null, 2));
-    console.log(`💾 Поръчка ${orderNumber} е отбелязана като платена.`);
+    } else {
+      console.log(
+        `ℹ️ Checkout приключи, но плащането не е paid. Поръчка: ${orderNumber}`
+      );
+    }
   }
-}
-
 
   res.status(200).send();
 });
 
-app.listen(3000, () => {
-  console.log('🚀 Server running at http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
 
 
