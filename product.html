@@ -238,24 +238,140 @@
           );
         }
 
-        // ✅ Product schema
+        // ✅ Product schema (обогатена за SEO по Part Number / OEM)
         const oldSchema = document.getElementById('product-schema');
         if (oldSchema) oldSchema.remove();
 
+        // Помощна функция — търси aspect по няколко възможни имена
+        function findAspect(aspects, names) {
+          if (!Array.isArray(aspects)) return null;
+          const lower = names.map(n => n.toLowerCase());
+          const found = aspects.find(a =>
+            a && a.name && lower.includes(String(a.name).toLowerCase())
+          );
+          return found ? found.value : null;
+        }
+
+        // Помощна функция — разделя "123, 456, 789" на масив
+        function splitIds(value) {
+          if (!value) return [];
+          return String(value)
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean);
+        }
+
+        // Извличане на ключови идентификатори
+        const mpnRaw = findAspect(data.localizedAspects, [
+          'Manufacturer Part Number', 'MPN', 'Part Number'
+        ]);
+        const oemRaw = findAspect(data.localizedAspects, [
+          'Reference OE/OEM Number', 'OEM Number', 'OEM'
+        ]);
+        const interchangeRaw = findAspect(data.localizedAspects, [
+          'Interchange Part Number', 'Interchange'
+        ]);
+        const supersededRaw = findAspect(data.localizedAspects, [
+          'Superseded Part Number'
+        ]);
+        const otherPartRaw = findAspect(data.localizedAspects, [
+          'Other Part Number'
+        ]);
+
+        const brand = findAspect(data.localizedAspects, [
+          'Brand', 'Марка', 'Manufacturer'
+        ]);
+        const condition = findAspect(data.localizedAspects, ['Condition']);
+        const country = findAspect(data.localizedAspects, [
+          'Country/Region of Manufacture', 'Country of Origin'
+        ]);
+
+        // Сплитваме на масиви
+        const mpnList = splitIds(mpnRaw);
+        const oemList = splitIds(oemRaw);
+        const interchangeList = splitIds(interchangeRaw);
+        const supersededList = splitIds(supersededRaw);
+        const otherPartList = splitIds(otherPartRaw);
+
+        // Главният MPN (първият)
+        const primaryMpn = mpnList[0] || null;
+
+        // Всички останали идентификатори (без главния MPN)
+        const allOtherIds = [
+          ...mpnList.slice(1),
+          ...oemList,
+          ...interchangeList,
+          ...supersededList,
+          ...otherPartList
+        ].filter((v, i, arr) => v && arr.indexOf(v) === i); // уникални
+
+        // Основен schema обект
         const schema = {
           "@context": "https://schema.org",
           "@type": "Product",
           "name": displayTitle,
-          "image": data.images || [],
+          "image": Array.isArray(data.images) ? data.images : [],
           "description": data.description || `${displayTitle} – авточаст втора употреба`,
           "offers": {
             "@type": "Offer",
             "priceCurrency": "EUR",
             "price": data.priceEUR || "",
             "availability": "https://schema.org/InStock",
-            "url": window.location.href
+            "url": window.location.href.split('?')[0] + '?id=' + encodeURIComponent(itemId)
           }
         };
+
+        // SKU — уникален идентификатор
+        if (itemId) {
+          schema.sku = itemId;
+        }
+
+        // MPN — главният номер (първият от списъка)
+        if (primaryMpn) {
+          schema.mpn = primaryMpn;
+        }
+
+        // Brand — марка на автомобила
+        if (brand) {
+          schema.brand = {
+            "@type": "Brand",
+            "name": brand
+          };
+        }
+
+        // Condition
+        if (condition) {
+          const c = String(condition).toLowerCase();
+          schema.itemCondition = (c.includes('new') || c.includes('нов'))
+            ? 'https://schema.org/NewCondition'
+            : 'https://schema.org/UsedCondition';
+        } else {
+          // Тъй като продаваш втора употреба — default
+          schema.itemCondition = 'https://schema.org/UsedCondition';
+        }
+
+        // Country of origin
+        if (country) {
+          schema.countryOfOrigin = country;
+        }
+
+        // Всички останали Part Numbers като identifier
+        if (allOtherIds.length > 0) {
+          schema.identifier = allOtherIds.map(num => ({
+            "@type": "PropertyValue",
+            "propertyID": "PartNumber",
+            "value": num
+          }));
+        }
+
+        // additionalProperty — всички localizedAspects
+        if (Array.isArray(data.localizedAspects) && data.localizedAspects.length > 0) {
+          schema.additionalProperty = data.localizedAspects.map(a => ({
+            "@type": "PropertyValue",
+            "name": a.name,
+            "value": String(a.value)
+          }));
+        }
 
         const script = document.createElement('script');
         script.type = 'application/ld+json';
